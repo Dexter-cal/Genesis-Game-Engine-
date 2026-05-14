@@ -1,0 +1,14 @@
+[project]
+name = "Neon Nexus"
+version = "0.1.0"
+template = "fps"
+created = "2023-10-27"
+
+[game]
+start_scene = "scenes/main.scene"
+target_fps = 144
+
+[ai]
+primary_agent = "architect"
+style = "cyberpunk"
+color_palette = ["#40B4FF", "#B06EFF", "#FF5FA0"]

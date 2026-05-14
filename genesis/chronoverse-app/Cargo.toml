@@ -1,0 +1,36 @@
+[package]
+name = "chronoverse-app"
+version.workspace = true
+edition.workspace = true
+description = "ChronoVerse — The AI-First Game Engine"
+
+[[bin]]
+name = "chronoverse"
+path = "src/main.rs"
+
+[[bin]]
+name = "chronoverse-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "chronoverse-cli"
+path = "src/cli.rs"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+async-trait = "0.1"
+
+chronoverse-core      = { workspace = true }
+chronoverse-ecs       = { workspace = true }
+chronoverse-math      = { workspace = true }
+chronoverse-physics   = { workspace = true }
+chronoverse-agents    = { workspace = true }
+chronoverse-input     = { workspace = true }
+chronoverse-network   = { workspace = true }
+chronoverse-scripting = { workspace = true }
+chronoverse-hub       = { workspace = true }

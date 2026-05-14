@@ -1,0 +1,16 @@
+# Neon Nexus - Main Script
+
+@ready
+fn start():
+    print("Welcome to Neon Nexus")
+    ai.say("System online. Neon environments stabilized.")
+
+@update
+fn update(dt):
+    # Spin the emerald prism
+    let prism = scene.find("EmeraldPrism")
+    prism.rotate_y(1.0 * dt)
+
+    # Pulsate the neon tower
+    let tower = scene.find("NeonTower")
+    tower.material.emission_strength = 1.0 + math.sin(time.now() * 2.0) * 0.5

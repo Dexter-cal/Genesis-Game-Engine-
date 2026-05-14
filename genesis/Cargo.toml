@@ -1,0 +1,129 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/chronoverse-core",
+    "crates/chronoverse-math",
+    "crates/chronoverse-ecs",
+    "crates/chronoverse-physics",
+    "crates/chronoverse-render",
+    "crates/chronoverse-audio",
+    "crates/chronoverse-input",
+    "crates/chronoverse-network",
+    "crates/chronoverse-assets",
+    "crates/chronoverse-scripting",
+    "crates/chronoverse-agents",
+    "crates/chronoverse-ai",
+    "crates/chronoverse-world",
+    "crates/chronoverse-npc",
+    "crates/chronoverse-combat",
+    "crates/chronoverse-ui",
+    "crates/chronoverse-editor",
+    "crates/chronoverse-runtime",
+    "crates/chronoverse-export",
+    "crates/chronoverse-hub",
+    "crates/chronoverse-plugins",
+    "crates/chronoverse-2d",
+    "crates/chronoverse-studio",
+    "crates/chronoverse-collab",
+    "crates/chronoverse-console",
+    "crates/chronoverse-text",
+    "crates/chronoverse-installer",
+    "crates/chronoverse-modeler",
+    "crates/chronoverse-vfx-compositor",
+    "crates/chronoverse-camera-modes",
+    "crates/chronoverse-materials",
+    "crates/chronoverse-cloth",
+    "crates/chronoverse-builtins",
+    "crates/chronoverse-locomotion",
+    "crates/chronoverse-templates",
+    "crates/chronoverse-consistency",
+    "crates/chronoverse-planning",
+    "crates/chronoverse-scene",
+    "crates/chronoverse-ai-runtime",
+    "crates/chronoverse-creatures",
+    "crates/chronoverse-ml",
+    "crates/genesis-performance",
+    "crates/genesis-social",
+    "crates/genesis-cast",
+    "crates/genesis-ui",
+    "crates/genesis-launch",
+    "crates/genesis-ai-modeler",
+    "crates/genesis-studio-v2",
+    "crates/genesis-creatures",
+    "crates/genesis-ml",
+    "crates/genesis-cinematics",
+    "crates/genesis-marketplace",
+    "crates/genesis-physics-advanced",
+    "crates/genesis-world-streaming",
+    "crates/genesis-anti-cheat",
+    "crates/genesis-networking-advanced",
+    "genesis-app",
+]
+
+[workspace.package]
+name    = "genesis-engine"
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+tokio      = { version="1",    features=["full"] }
+serde      = { version="1",    features=["derive"] }
+serde_json = "1"
+toml       = "0.8"
+anyhow     = "1"
+thiserror  = "1"
+tracing    = "0.1"
+tracing-subscriber = { version="0.3", features=["env-filter"] }
+uuid       = { version="1",    features=["v4","serde"] }
+chrono     = { version="0.4",  features=["serde"] }
+rand       = "0.8"
+reqwest    = { version="0.11", features=["json","stream"] }
+clap       = { version="4",    features=["derive","env"] }
+ctrlc      = "3"
+walkdir    = "2"
+dirs       = "5"
+parking_lot= "0.12"
+rayon      = "1"
+indexmap   = "2"
+bitflags   = "2"
+bytemuck   = "1.14"
+wgpu       = "0.19"
+egui       = "0.26"
+rapier3d   = "0.18"
+hecs       = "0.10"
+mlua       = "0.9"
+rhai       = "1.16"
+image      = "0.24"
+glam       = "0.24"
+winit      = "0.29"
+async-trait = "0.1"
+
+# Workspace crate dependencies
+chronoverse-core = { path = "crates/chronoverse-core" }
+chronoverse-math = { path = "crates/chronoverse-math" }
+chronoverse-ecs  = { path = "crates/chronoverse-ecs" }
+chronoverse-render = { path = "crates/chronoverse-render" }
+
+[profile.dev]
+opt-level = 1
+debug     = true
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+panic         = "abort"
+
+[profile.profiling]
+inherits = "release"
+debug    = true
+
+[workspace.metadata.genesis]
+version  = "0.1.0"
+codename = "GENESIS"
+tagline  = "Where Worlds Begin"
+url      = "https://genesis-engine.io"
+crates   = 56
