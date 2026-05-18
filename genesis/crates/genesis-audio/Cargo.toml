@@ -1,6 +1,6 @@
 [package]
 name = "genesis-audio"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "Spatial audio, DSP, adaptive music, voice cloning, TTS pipeline"
 [dependencies]

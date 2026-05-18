@@ -1,29 +1,14 @@
-use genesis_core::GenesisApp;
+use genesis_core::Engine;
 use genesis_ecs::World;
-use genesis_math::Vec3;
-use genesis_agents::Agent;
+use genesis_agents::AgentCouncil;
 
 fn main() {
-    println!("Starting Neon Nexus - Built with Genesis Engine");
-
-    let mut app = GenesisApp::new();
+    let mut engine = Engine::new("Neon Nexus");
     let mut world = World::new();
+    let mut council = AgentCouncil::new();
 
-    // Create Player
-    let player = world.spawn()
-        .with(Vec3::new(0.0, 0.0, 0.0))
-        .with("Player".to_string())
-        .id();
+    tracing::info!("Starting Neon Nexus...");
 
-    // Create AI Guardian using the new Genesis AI system
-    let guardian = world.spawn()
-        .with(Vec3::new(10.0, 0.0, 10.0))
-        .with(Agent::new("Neon Guardian"))
-        .id();
-
-    println!("World initialized with {} entities.", world.len());
-    println!("Neon Guardian deployed at [10, 0, 10]");
-
-    // app.run(world); // Real game loop
-    println!("Neon Nexus Demo: Logic Verified.");
+    // Initializing the world with AI agents
+    engine.run(&mut world, &mut council);
 }

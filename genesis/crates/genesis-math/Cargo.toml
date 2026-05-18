@@ -1,6 +1,6 @@
 [package]
 name = "genesis-math"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "Math utilities for ChronoVerse - vectors, matrices, quaternions, noise"
 [dependencies]

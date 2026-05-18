@@ -1,6 +1,6 @@
 [package]
 name = "chronoverse-app"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "ChronoVerse — The AI-First Game Engine"
 

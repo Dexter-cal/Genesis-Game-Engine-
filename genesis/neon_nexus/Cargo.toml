@@ -5,10 +5,6 @@ edition = "2021"
 
 [dependencies]
 genesis-core = { path = "../crates/genesis-core" }
-genesis-math = { path = "../crates/genesis-math" }
 genesis-ecs = { path = "../crates/genesis-ecs" }
-genesis-render = { path = "../crates/genesis-render" }
-genesis-physics = { path = "../crates/genesis-physics" }
-genesis-input = { path = "../crates/genesis-input" }
 genesis-agents = { path = "../crates/genesis-agents" }
-genesis-ai = { path = "../crates/genesis-ai" }
+tracing = "0.1"

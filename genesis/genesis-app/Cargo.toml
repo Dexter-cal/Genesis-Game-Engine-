@@ -1,6 +1,6 @@
 [package]
 name = "genesis-app"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "GENESIS Engine — Where Worlds Begin"
 

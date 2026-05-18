@@ -419,3 +419,4 @@ fn provider_key_name(p:&AiProvider) -> Option<&'static str> {
 }
 extern crate tracing;
 pub mod nodes;
+pub mod mcp;

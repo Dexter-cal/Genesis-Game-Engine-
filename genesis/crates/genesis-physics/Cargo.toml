@@ -1,6 +1,6 @@
 [package]
 name = "genesis-physics"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "Physics simulation - rigid body, collision, joints, fluid, cloth, wind"
 [dependencies]

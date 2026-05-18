@@ -1,6 +1,6 @@
 [package]
 name = "genesis-agents"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "The AI Agent Council - 30+ specialized agents that build and run games"
 [dependencies]

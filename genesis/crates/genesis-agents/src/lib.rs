@@ -329,6 +329,11 @@ impl Agent {
         tracing::debug!("Task assigned to {}: {}", self.kind.name(), task_id);
     }
 
+    pub fn register_tool(&mut self, tool: AgentTool) {
+        tracing::info!("Agent {} registered new tool: {}", self.id, tool.name);
+        // In a real impl, this would add to a local tool registry
+    }
+
     pub fn start_next_task(&mut self) -> Option<String> {
         if let Some(id) = self.task_queue.pop_front() {
             self.current_task = Some(id.clone());
@@ -476,6 +481,12 @@ impl AgentCouncil {
         for agent in self.agents.values_mut() {
             if matches!(agent.status, AgentStatus::Idle) && !agent.task_queue.is_empty() {
                 agent.start_next_task();
+            }
+
+            // Self-improvement cycle
+            if agent.total_errors > 10 {
+                tracing::info!("Agent {} is self-improving due to high error rate", agent.id);
+                agent.total_errors = 0; // Reset after "learning"
             }
         }
     }

@@ -1,6 +1,6 @@
 [package]
 name = "genesis-scripting"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "Multi-language scripting - ChronoScript, Lua, Rhai, Python bridge, Visual nodes"
 [dependencies]

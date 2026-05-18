@@ -1,6 +1,6 @@
 [package]
 name = "genesis-world"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "World generation - chunks, biomes, navmesh, procedural terrain"
 [dependencies]

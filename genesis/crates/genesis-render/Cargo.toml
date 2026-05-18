@@ -1,6 +1,6 @@
 [package]
 name = "genesis-render"
-version.workspace = true
+version = { workspace = true }
 edition.workspace = true
 description = "WGPU-based renderer - meshes, shadows, PBR, particles, water, post-processing"
 [dependencies]
