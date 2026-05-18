@@ -1,0 +1,16 @@
+[package]
+name = "genesis-network"
+version.workspace = true
+edition.workspace = true
+description = "Multiplayer networking - co-op, PvP, split-screen, online, spectator, voice chat"
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+bytes = { workspace = true }
+async-trait.workspace = true
+genesis-core = { workspace = true }
+genesis-math = { workspace = true }

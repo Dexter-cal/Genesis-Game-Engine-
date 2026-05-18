@@ -1,0 +1,24 @@
+[package]
+name = "genesis-agents"
+version.workspace = true
+edition.workspace = true
+description = "The AI Agent Council - 30+ specialized agents that build and run games"
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+dashmap = { workspace = true }
+parking_lot = { workspace = true }
+crossbeam = { workspace = true }
+flume = { workspace = true }
+reqwest = { workspace = true }
+async-trait.workspace = true
+tokio-util = { workspace = true }
+genesis-core = { workspace = true }
+genesis-math = { workspace = true }
+genesis-ecs  = { workspace = true }

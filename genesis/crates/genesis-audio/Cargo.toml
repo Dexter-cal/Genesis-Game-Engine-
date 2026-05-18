@@ -1,0 +1,17 @@
+[package]
+name = "genesis-audio"
+version.workspace = true
+edition.workspace = true
+description = "Spatial audio, DSP, adaptive music, voice cloning, TTS pipeline"
+[dependencies]
+cpal = { workspace = true }
+hound = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+async-trait.workspace = true
+tokio = { workspace = true }
+parking_lot = { workspace = true }
+genesis-core = { workspace = true }
+genesis-math = { workspace = true }

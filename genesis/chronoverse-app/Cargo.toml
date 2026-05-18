@@ -5,15 +5,12 @@ edition.workspace = true
 description = "ChronoVerse — The AI-First Game Engine"
 
 [[bin]]
-name = "chronoverse"
 path = "src/main.rs"
 
 [[bin]]
-name = "chronoverse-server"
 path = "src/server.rs"
 
 [[bin]]
-name = "chronoverse-cli"
 path = "src/cli.rs"
 
 [dependencies]
@@ -23,7 +20,7 @@ serde_json = { workspace = true }
 anyhow = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-async-trait = "0.1"
+async-trait.workspace = true
 
 chronoverse-core      = { workspace = true }
 chronoverse-ecs       = { workspace = true }
