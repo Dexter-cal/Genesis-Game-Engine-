@@ -1,0 +1,155 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/genesis-core",
+    "crates/genesis-math",
+    "crates/genesis-ecs",
+    "crates/genesis-physics",
+    "crates/genesis-render",
+    "crates/genesis-audio",
+    "crates/genesis-input",
+    "crates/genesis-network",
+    "crates/genesis-assets",
+    "crates/genesis-scripting",
+    "crates/genesis-agents",
+    "crates/genesis-ai",
+    "crates/genesis-world",
+    "crates/genesis-npc",
+    "crates/genesis-combat",
+    "crates/genesis-ui",
+    "crates/genesis-editor",
+    "crates/genesis-runtime",
+    "crates/genesis-export",
+    "crates/genesis-hub",
+    "crates/genesis-plugins",
+    "crates/genesis-2d",
+    "crates/genesis-studio",
+    "crates/genesis-collab",
+    "crates/genesis-console",
+    "crates/genesis-text",
+    "crates/genesis-installer",
+    "crates/genesis-modeler",
+    "crates/genesis-vfx-compositor",
+    "crates/genesis-camera-modes",
+    "crates/genesis-materials",
+    "crates/genesis-cloth",
+    "crates/genesis-builtins",
+    "crates/genesis-locomotion",
+    "crates/genesis-templates",
+    "crates/genesis-consistency",
+    "crates/genesis-planning",
+    "crates/genesis-scene",
+    "crates/genesis-ai-runtime",
+    "crates/genesis-creatures",
+    "crates/genesis-ml",
+    "crates/genesis-performance",
+    "crates/genesis-social",
+    "crates/genesis-cast",
+    "crates/genesis-launch",
+    "crates/genesis-ai-modeler",
+    "crates/genesis-studio-v2",
+    "crates/genesis-cinematics",
+    "crates/genesis-marketplace",
+    "crates/genesis-physics-advanced",
+    "crates/genesis-world-streaming",
+    "crates/genesis-anti-cheat",
+    "crates/genesis-networking-advanced",
+    "genesis-app",
+]
+
+[workspace.package]
+name    = "genesis-engine"
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+tokio      = { version="1",    features=["full"] }
+serde      = { version="1",    features=["derive"] }
+serde_json = "1"
+toml       = "0.8"
+anyhow     = "1"
+thiserror  = "1"
+tracing    = "0.1"
+tracing-subscriber = { version="0.3", features=["env-filter"] }
+uuid       = { version="1",    features=["v4","serde"] }
+chrono     = { version="0.4",  features=["serde"] }
+rand       = "0.8"
+reqwest    = { version="0.11", features=["json","stream"] }
+clap       = { version="4",    features=["derive","env"] }
+ctrlc      = "3"
+walkdir    = "2"
+dirs       = "5"
+parking_lot= "0.12"
+rayon      = "1"
+indexmap   = "2"
+bitflags   = "2"
+bytemuck   = { version="1.14", features=["derive"] }
+wgpu       = "0.19"
+egui       = "0.26"
+rapier3d   = "0.18"
+rapier2d   = "0.18"
+hecs       = "0.10"
+mlua       = "0.9"
+rhai       = "1.16"
+image      = "0.24"
+glam       = "0.24"
+winit      = "0.29"
+async-trait = "0.1"
+crossbeam  = "0.8"
+futures    = "0.3"
+log        = "0.4"
+cpal       = "0.15"
+hound      = "3.5"
+rodio      = "0.17"
+bytes      = "1"
+quinn      = "0.10"
+tokio-util = { version="0.7", features=["codec"] }
+dashmap    = "5"
+flume      = "0.11"
+
+# Workspace crate dependencies
+genesis-core = { path = "crates/genesis-core" }
+genesis-math = { path = "crates/genesis-math" }
+genesis-ecs  = { path = "crates/genesis-ecs" }
+genesis-render = { path = "crates/genesis-render" }
+genesis-physics = { path = "crates/genesis-physics" }
+genesis-audio = { path = "crates/genesis-audio" }
+genesis-input = { path = "crates/genesis-input" }
+genesis-network = { path = "crates/genesis-network" }
+genesis-assets = { path = "crates/genesis-assets" }
+genesis-scripting = { path = "crates/genesis-scripting" }
+genesis-agents = { path = "crates/genesis-agents" }
+genesis-ai = { path = "crates/genesis-ai" }
+genesis-world = { path = "crates/genesis-world" }
+genesis-npc = { path = "crates/genesis-npc" }
+genesis-combat = { path = "crates/genesis-combat" }
+genesis-ui = { path = "crates/genesis-ui" }
+genesis-editor = { path = "crates/genesis-editor" }
+genesis-runtime = { path = "crates/genesis-runtime" }
+genesis-export = { path = "crates/genesis-export" }
+genesis-hub = { path = "crates/genesis-hub" }
+genesis-plugins = { path = "crates/genesis-plugins" }
+
+[profile.dev]
+opt-level = 1
+debug     = true
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+opt-level     = 3
+lto           = "thin"
+codegen-units = 1
+panic         = "abort"
+
+[profile.profiling]
+inherits = "release"
+debug    = true
+
+[workspace.metadata.genesis]
+version  = "0.1.0"
+codename = "GENESIS"
+tagline  = "Where Worlds Begin"
+url      = "https://genesis-engine.io"
+crates   = 56

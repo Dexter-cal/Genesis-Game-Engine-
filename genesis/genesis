@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Genesis Engine CLI entry point
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+exec "$DIR/launch.sh" "$@"

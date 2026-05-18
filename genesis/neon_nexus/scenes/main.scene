@@ -1,0 +1,12 @@
+{
+  "name": "Neon Nexus Hub",
+  "nodes": [
+    {"type": "WorldEnvironment", "name": "NeonSky", "properties": {"glow": true, "bloom": 0.8}},
+    {"type": "DirectionalLight3D", "name": "CyanSun", "rotation": [-45, 45, 0], "color": "#40B4FF"},
+    {"type": "Camera3D", "name": "MainCamera", "position": [0, 2, 10]},
+    {"type": "MeshInstance3D", "name": "NeonTower", "position": [0, 0, 0], "color": "#B06EFF", "mesh": "tower_01"},
+    {"type": "MeshInstance3D", "name": "EmeraldPrism", "position": [5, 0, -5], "color": "#3DFFA0", "mesh": "prism_01"},
+    {"type": "MeshInstance3D", "name": "RubyShard", "position": [-5, 0, -5], "color": "#FF4D6A", "mesh": "shard_01"},
+    {"type": "Node3D", "name": "Player", "position": [0, 1, 5], "scripts": ["scripts/main.cv"]}
+  ]
+}

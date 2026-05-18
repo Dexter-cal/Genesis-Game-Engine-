@@ -1,0 +1,16 @@
+[package]
+name = "genesis-world"
+version.workspace = true
+edition.workspace = true
+description = "World generation - chunks, biomes, navmesh, procedural terrain"
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+tracing = { workspace = true }
+rand = { workspace = true }
+tokio = { workspace = true }
+async-trait.workspace = true
+genesis-core = { workspace = true }
+genesis-math = { workspace = true }
+genesis-ecs  = { workspace = true }

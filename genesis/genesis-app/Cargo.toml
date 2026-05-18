@@ -1,0 +1,33 @@
+[package]
+name = "genesis-app"
+version.workspace = true
+edition.workspace = true
+description = "GENESIS Engine — Where Worlds Begin"
+
+[[bin]]
+name = "genesis-engine"
+path = "src/main.rs"
+
+[[bin]]
+name = "genesis-server"
+path = "src/server.rs"
+
+[[bin]]
+name = "genesis-cli"
+path = "src/cli.rs"
+
+[dependencies]
+tokio       = { version="1", features=["full"] }
+anyhow.workspace = true
+tracing.workspace = true
+tracing-subscriber = { version="0.3", features=["env-filter"] }
+serde       = { version="1", features=["derive"] }
+serde_json.workspace = true
+toml.workspace = true
+clap        = { version="4", features=["derive","env"] }
+chrono      = { version="0.4", features=["serde"] }
+uuid        = { version="1", features=["v4"] }
+ctrlc.workspace = true
+reqwest     = { version="0.11", features=["json"] }
+walkdir.workspace = true
+dirs.workspace = true

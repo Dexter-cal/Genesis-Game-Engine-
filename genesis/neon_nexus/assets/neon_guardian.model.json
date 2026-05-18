@@ -1,0 +1,59 @@
+{
+  "name": "Neon Guardian",
+  "version": "1.0.0",
+  "metadata": {
+    "author": "ShadowWolf99",
+    "description": "A rigged guardian for the Neon Nexus project.",
+    "tags": ["neon", "guardian", "rigged", "humanoid"]
+  },
+  "geometry": {
+    "vertices": 42500,
+    "indices": 127500,
+    "bounding_box": {
+      "min": [-0.5, 0.0, -0.2],
+      "max": [0.5, 1.8, 0.2]
+    }
+  },
+  "skeleton": {
+    "root": {
+      "name": "root",
+      "position": [0, 0, 0],
+      "rotation": [0, 0, 0, 1],
+      "children": [
+        {
+          "name": "spine",
+          "position": [0, 0.9, 0],
+          "children": [
+            {
+              "name": "head",
+              "position": [0, 0.7, 0]
+            },
+            {
+              "name": "arm.L",
+              "position": [-0.2, 0.6, 0],
+              "children": [
+                { "name": "hand.L", "position": [-0.4, 0, 0] }
+              ]
+            },
+            {
+              "name": "arm.R",
+              "position": [0.2, 0.6, 0],
+              "children": [
+                { "name": "hand.R", "position": [0.4, 0, 0] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "materials": [
+    {
+      "name": "Neon_Blue_Armor",
+      "albedo": [0.1, 0.3, 0.8, 1.0],
+      "emissive": [0.0, 0.5, 1.0, 10.0],
+      "metallic": 0.9,
+      "roughness": 0.1
+    }
+  ]
+}

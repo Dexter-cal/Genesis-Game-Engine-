@@ -1,0 +1,17 @@
+Workspace Members: 54
+Workspace Dependencies: 56
+Traceback (most recent call last):
+  File "/home/jules/self_created_tools/workspace_doctor.py", line 56, in <module>
+    check_workspace('genesis')
+  File "/home/jules/self_created_tools/workspace_doctor.py", line 27, in check_workspace
+    mdata = tomllib.load(f)
+            ^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/tomllib/_parser.py", line 66, in load
+    return loads(s, parse_float=parse_float)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/tomllib/_parser.py", line 102, in loads
+    pos = key_value_rule(src, pos, out, header, parse_float)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/jules/.pyenv/versions/3.12.13/lib/python3.12/tomllib/_parser.py", line 349, in key_value_rule
+    raise suffixed_err(src, pos, "Cannot overwrite a value")
+tomllib.TOMLDecodeError: Cannot overwrite a value (at line 5, column 25)

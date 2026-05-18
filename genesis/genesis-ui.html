@@ -1,0 +1,2729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GENESIS Engine</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* ═══════════════════════════ DESIGN TOKENS ═══════════════════════════ */
+:root {
+  /* Blender/PS5 Professional Palette */
+  --bg-void:        #0A0B10;
+  --bg-deep:        #14161F;
+  --bg-base:        #1C1E26;
+  --bg-surface:     #252833;
+  --bg-raised:      #2D313D;
+  --bg-float:       #363B47;
+  --bg-hover:       #3F4452;
+
+  --border-subtle:  rgba(255,255,255,0.03);
+  --border-default: rgba(255,255,255,0.07);
+  --border-bright:  rgba(255,255,255,0.12);
+  --border-accent:  rgba(100,180,255,0.4);
+
+  --text-primary:   #E1E4EB;
+  --text-secondary: #A0A8C0;
+  --text-muted:     #6C7693;
+  --text-hint:      #4A526B;
+
+  --accent:         #64B4FF; /* Sophisticated Blue */
+  --accent-soft:    rgba(100,180,255,0.1);
+  --accent-glow:    rgba(100,180,255,0.05);
+
+  --green:          #4BD991;
+  --green-soft:     rgba(75,217,145,0.1);
+  --amber:          #FFB340;
+  --amber-soft:     rgba(255,179,64,0.1);
+  --red:            #FF5C75;
+  --red-soft:       rgba(255,92,117,0.1);
+  --purple:         #A885FF;
+  --purple-soft:    rgba(168,133,255,0.1);
+  --pink:           #FF70B5;
+
+  --gradient-brand: linear-gradient(135deg, #64B4FF 0%, #A885FF 100%);
+  --gradient-dark:  linear-gradient(180deg, rgba(64,180,255,0.06) 0%, transparent 100%);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 20px;
+  --radius-full: 9999px;
+
+  --shadow-sm:  0 1px 3px rgba(0,0,0,0.4);
+  --shadow-md:  0 4px 16px rgba(0,0,0,0.5);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,0.6);
+  --shadow-xl:  0 24px 80px rgba(0,0,0,0.8);
+  --glow-accent: 0 0 40px rgba(64,180,255,0.2);
+
+  --font-ui:    'Inter', 'Sora', sans-serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --font-brand: 'Outfit', sans-serif;
+
+  --transition: 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ═══════════════════════════ RESET & BASE ════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-ui);
+  background: var(--bg-void);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  cursor: default;
+  user-select: none;
+}
+
+/* Background grid pattern */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(64,180,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(64,180,255,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ═══════════════════════════ SCREENS ════════════════════════════════ */
+.screen {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column;
+  opacity: 0; transition: opacity var(--transition-slow);
+  z-index: 1;
+}
+.screen.active { display: flex; opacity: 1; }
+.screen.fade-in { animation: fadeIn 0.5s ease forwards; }
+
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeInScale { from { opacity:0; transform:scale(0.96); } to { opacity:1; transform:scale(1); } }
+@keyframes slideUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+@keyframes shimmer { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+@keyframes pulse { 0%,100% { transform:scale(1); } 50% { transform:scale(1.05); } }
+@keyframes spinSlow { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+@keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
+@keyframes agentThink { 0%,100% { opacity:0.3; transform:scaleX(0.6); } 50% { opacity:1; transform:scaleX(1); } }
+@keyframes typing { 0%,100% { opacity:0; } 50% { opacity:1; } }
+@keyframes progress { from { transform:scaleX(0); } to { transform:scaleX(1); } }
+
+/* ═══════════════════════════ SPLASH SCREEN ══════════════════════════ */
+#splash {
+  align-items: center; justify-content: center;
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(64,180,255,0.08) 0%, transparent 70%),
+              var(--bg-void);
+}
+
+.splash-logo {
+  display: flex; flex-direction: column; align-items: center; gap: 20px;
+  animation: fadeInScale 0.8s ease forwards;
+}
+
+.splash-icon {
+  width: 96px; height: 96px; position: relative;
+}
+.splash-icon svg { width: 100%; height: 100%; }
+
+.splash-name {
+  font-family: var(--font-brand);
+  font-size: 52px; font-weight: 800;
+  letter-spacing: -1px;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.splash-tagline {
+  font-size: 15px; color: var(--text-muted);
+  letter-spacing: 4px; text-transform: uppercase;
+  font-weight: 300;
+}
+
+.splash-progress {
+  margin-top: 48px; width: 280px;
+}
+.splash-progress-track {
+  height: 2px; background: var(--border-subtle);
+  border-radius: var(--radius-full); overflow: hidden;
+}
+.splash-progress-bar {
+  height: 100%; background: var(--gradient-brand);
+  border-radius: var(--radius-full);
+  transform-origin: left;
+  animation: progress 2.5s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.splash-status {
+  margin-top: 12px; font-size: 12px; color: var(--text-muted);
+  font-family: var(--font-mono); text-align: center;
+  animation: shimmer 1.5s ease infinite;
+}
+
+/* ═══════════════════════════ MAIN NAVIGATION ════════════════════════ */
+.titlebar {
+  height: 42px; flex-shrink: 0;
+  display: flex; align-items: center;
+  background: rgba(13,16,23,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0 16px; gap: 0;
+  -webkit-app-region: drag;
+  z-index: 100;
+}
+.titlebar * { -webkit-app-region: no-drag; }
+
+.titlebar-brand {
+  display: flex; align-items: center; gap: 8px;
+  margin-right: 32px; cursor: pointer;
+}
+.titlebar-brand svg { width: 22px; height: 22px; }
+.titlebar-brand-name {
+  font-family: var(--font-brand);
+  font-size: 15px; font-weight: 700;
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-tabs {
+  display: flex; gap: 2px; flex: 1;
+}
+.nav-tab {
+  display: flex; align-items: center; gap: 6px;
+  padding: 0 14px; height: 42px;
+  font-size: 13px; color: var(--text-muted);
+  cursor: pointer; border-bottom: 2px solid transparent;
+  transition: var(--transition); white-space: nowrap;
+  font-weight: 500;
+}
+.nav-tab:hover { color: var(--text-secondary); }
+.nav-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.nav-tab .tab-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; opacity: 0.5;
+}
+.nav-tab.active .tab-dot { opacity: 1; }
+
+.titlebar-right {
+  display: flex; align-items: center; gap: 8px;
+  margin-left: auto;
+}
+.tb-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: var(--radius-sm);
+  background: transparent; border: 1px solid var(--border-default);
+  color: var(--text-secondary); font-size: 12px; cursor: pointer;
+  transition: var(--transition); font-family: var(--font-ui);
+  font-weight: 500;
+}
+.tb-btn:hover { background: var(--bg-hover); color: var(--text-primary); border-color: var(--border-bright); }
+.tb-btn.primary { background: var(--accent-soft); border-color: var(--border-accent); color: var(--accent); }
+.tb-btn.primary:hover { background: rgba(64,180,255,0.25); }
+
+.tb-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gradient-brand);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  border: 2px solid var(--border-default);
+  transition: var(--transition);
+}
+.tb-avatar:hover { border-color: var(--accent); }
+
+.window-controls { display: flex; gap: 6px; margin-left: 12px; }
+.wc { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; transition: var(--transition); }
+.wc:hover { transform: scale(1.2); }
+.wc.close { background: #FF5F57; }
+.wc.min { background: #FEBC2E; }
+.wc.max { background: #28C840; }
+
+/* ═══════════════════════════ HOME SCREEN ════════════════════════════ */
+#home { overflow: hidden; }
+
+.home-content {
+  flex: 1; overflow-y: auto; padding: 32px 40px;
+  display: flex; flex-direction: column; gap: 40px;
+}
+.home-content::-webkit-scrollbar { width: 4px; }
+.home-content::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
+
+/* Hero welcome strip */
+.home-hero {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, rgba(64,180,255,0.07) 0%, rgba(176,110,255,0.07) 50%, rgba(255,95,160,0.05) 100%);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  position: relative; overflow: hidden;
+}
+.home-hero::before {
+  content: '';
+  position: absolute; top: -50%; right: -10%;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(176,110,255,0.1), transparent 70%);
+  pointer-events: none;
+}
+.hero-text h1 {
+  font-family: var(--font-brand);
+  font-size: 26px; font-weight: 700;
+}
+.hero-text h1 span {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-text p { margin-top: 6px; color: var(--text-secondary); font-size: 14px; }
+.hero-actions { display: flex; gap: 10px; }
+.hero-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: var(--transition); font-family: var(--font-ui);
+  white-space: nowrap;
+}
+.hero-btn.primary {
+  background: var(--accent); color: var(--bg-void);
+  border: none; box-shadow: 0 4px 16px rgba(64,180,255,0.3);
+}
+.hero-btn.primary:hover {
+  background: #60C4FF;
+  box-shadow: 0 6px 24px rgba(64,180,255,0.5);
+  transform: translateY(-1px);
+}
+.hero-btn.secondary {
+  background: var(--bg-raised); color: var(--text-primary);
+  border: 1px solid var(--border-default);
+}
+.hero-btn.secondary:hover { background: var(--bg-float); border-color: var(--border-bright); }
+
+/* Section headers */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.section-title {
+  font-size: 13px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  color: var(--text-muted);
+}
+.section-action {
+  font-size: 12px; color: var(--accent); cursor: pointer;
+  transition: var(--transition);
+}
+.section-action:hover { color: #60C4FF; }
+
+/* Quick stats bar */
+.stats-bar {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+}
+.stat-card {
+  padding: 16px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+}
+.stat-card:hover { border-color: var(--border-default); background: var(--bg-raised); }
+.stat-value {
+  font-size: 28px; font-weight: 800;
+  font-family: var(--font-brand);
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.stat-label { margin-top: 4px; font-size: 12px; color: var(--text-muted); }
+
+/* Projects grid - PS5 inspired horizontal cards */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.project-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden; cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  animation: fadeIn 0.4s ease both;
+}
+.project-card:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-3px);
+  box-shadow: var(--glow-accent);
+}
+.project-card:nth-child(1) { animation-delay: 0.0s; }
+.project-card:nth-child(2) { animation-delay: 0.06s; }
+.project-card:nth-child(3) { animation-delay: 0.12s; }
+.project-card:nth-child(4) { animation-delay: 0.18s; }
+.project-card:nth-child(5) { animation-delay: 0.24s; }
+.project-card:nth-child(6) { animation-delay: 0.30s; }
+
+.project-poster {
+  width: 100%; height: 130px; object-fit: cover;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px; position: relative;
+}
+.project-poster-bg {
+  position: absolute; inset: 0;
+  background: var(--poster-gradient, linear-gradient(135deg, #1a2040, #0d1428));
+}
+.project-poster-icon {
+  position: relative; z-index: 1; font-size: 44px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+}
+.project-poster-badge {
+  position: absolute; top: 8px; right: 8px;
+  padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.project-poster-badge.dev { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(255,184,48,0.3); }
+.project-poster-badge.done { background: var(--green-soft); color: var(--green); border: 1px solid rgba(61,255,160,0.3); }
+.project-poster-badge.new { background: var(--accent-soft); color: var(--accent); border: 1px solid var(--border-accent); }
+
+.project-info {
+  padding: 12px 14px 14px;
+}
+.project-name {
+  font-size: 14px; font-weight: 600; color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.project-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 6px;
+}
+.project-genre {
+  font-size: 11px; color: var(--text-muted);
+  background: var(--bg-hover); padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+.project-time { font-size: 11px; color: var(--text-muted); }
+
+.project-progress {
+  margin-top: 10px; height: 3px;
+  background: var(--border-subtle); border-radius: 2px; overflow: hidden;
+}
+.project-progress-fill {
+  height: 100%; border-radius: 2px;
+  background: var(--gradient-brand);
+  transition: width 0.5s ease;
+}
+
+.project-actions {
+  display: flex; gap: 6px; padding: 10px 14px;
+  border-top: 1px solid var(--border-subtle);
+}
+.proj-action {
+  flex: 1; padding: 6px;
+  background: var(--bg-hover); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm); font-size: 11px;
+  color: var(--text-secondary); cursor: pointer;
+  transition: var(--transition); text-align: center;
+  font-family: var(--font-ui); font-weight: 500;
+}
+.proj-action:hover { background: var(--bg-float); color: var(--text-primary); border-color: var(--border-default); }
+.proj-action.accent { color: var(--accent); border-color: var(--border-accent); background: var(--accent-soft); }
+.proj-action.accent:hover { background: rgba(64,180,255,0.25); }
+
+/* Create new card */
+.create-card {
+  background: var(--bg-surface);
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-lg);
+  cursor: pointer; transition: var(--transition);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 220px; gap: 12px;
+  animation: fadeIn 0.4s 0.36s ease both;
+}
+.create-card:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+.create-card-icon {
+  width: 48px; height: 48px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; transition: var(--spring);
+}
+.create-card:hover .create-card-icon {
+  background: var(--accent-soft);
+  border-color: var(--border-accent);
+  transform: scale(1.1) rotate(4deg);
+}
+.create-card-text { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.create-card:hover .create-card-text { color: var(--accent); }
+
+/* ═══════════════════════════ CREATE MODAL ═══════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; opacity: 0; pointer-events: none;
+  transition: opacity var(--transition);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  transform: scale(0.94) translateY(16px);
+  transition: var(--spring);
+  box-shadow: var(--shadow-xl);
+  position: relative; overflow: hidden;
+}
+.modal-overlay.open .modal {
+  transform: scale(1) translateY(0);
+}
+
+/* Create game choice modal */
+.create-choice {
+  width: 600px;
+}
+.create-choice-title {
+  text-align: center; margin-bottom: 8px;
+  font-family: var(--font-brand);
+  font-size: 22px; font-weight: 700;
+}
+.create-choice-sub {
+  text-align: center; color: var(--text-secondary);
+  font-size: 13px; margin-bottom: 32px;
+}
+
+.choice-cards {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+}
+.choice-card {
+  padding: 28px 24px;
+  background: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  cursor: pointer; transition: var(--transition);
+  text-align: center; position: relative; overflow: hidden;
+}
+.choice-card::before {
+  content: ''; position: absolute; inset: 0;
+  opacity: 0; transition: var(--transition);
+}
+.choice-card.ai::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(176,110,255,0.15), transparent 70%);
+}
+.choice-card.manual::before {
+  background: radial-gradient(ellipse at 50% 0%, rgba(64,180,255,0.1), transparent 70%);
+}
+.choice-card:hover { border-color: var(--border-bright); }
+.choice-card.ai:hover { border-color: rgba(176,110,255,0.5); }
+.choice-card.manual:hover { border-color: var(--border-accent); }
+.choice-card:hover::before { opacity: 1; }
+.choice-card:hover { transform: translateY(-2px); }
+
+.choice-icon {
+  font-size: 42px; margin-bottom: 16px;
+  animation: float 3s ease-in-out infinite;
+}
+.choice-card.ai .choice-icon { animation-delay: -0.5s; }
+.choice-title {
+  font-size: 17px; font-weight: 700; margin-bottom: 8px;
+}
+.choice-card.ai .choice-title { color: var(--purple); }
+.choice-card.manual .choice-title { color: var(--accent); }
+.choice-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; }
+.choice-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  justify-content: center; margin-top: 14px;
+}
+.choice-tag {
+  font-size: 10px; padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.choice-card.ai .choice-tag { background: var(--purple-soft); color: var(--purple); }
+.choice-card.manual .choice-tag { background: var(--accent-soft); color: var(--accent); }
+
+/* ═══════════════════════════ AI PLAN SCREEN ═════════════════════════ */
+#ai-plan {
+  background: var(--bg-deep);
+}
+
+.plan-header {
+  padding: 20px 28px;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; gap: 16px;
+}
+.plan-back {
+  width: 32px; height: 32px; border-radius: var(--radius-md);
+  background: var(--bg-raised); border: 1px solid var(--border-default);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--transition); font-size: 16px;
+}
+.plan-back:hover { background: var(--bg-float); border-color: var(--border-bright); }
+.plan-title { font-family: var(--font-brand); font-size: 18px; font-weight: 700; }
+.plan-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.plan-body {
+  flex: 1; display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0; overflow: hidden;
+}
+
+/* Left: conversation */
+.plan-chat {
+  display: flex; flex-direction: column;
+  border-right: 1px solid var(--border-subtle);
+  background: var(--bg-void);
+}
+.plan-messages {
+  flex: 1; overflow-y: auto; padding: 24px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+.plan-messages::-webkit-scrollbar { width: 3px; }
+.plan-messages::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+.msg { display: flex; gap: 12px; animation: slideUp 0.3s ease; }
+.msg.user { flex-direction: row-reverse; }
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+}
+.msg.ai .msg-avatar { background: var(--purple-soft); border: 1px solid rgba(176,110,255,0.3); font-size: 18px; }
+.msg.user .msg-avatar { background: var(--accent-soft); border: 1px solid var(--border-accent); }
+.msg-bubble {
+  max-width: 75%; padding: 12px 16px;
+  border-radius: var(--radius-lg); font-size: 13px; line-height: 1.6;
+}
+.msg.ai .msg-bubble {
+  background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  border-bottom-left-radius: 4px; color: var(--text-primary);
+}
+.msg.user .msg-bubble {
+  background: var(--accent-soft); border: 1px solid var(--border-accent);
+  border-bottom-right-radius: 4px; color: var(--text-primary);
+}
+
+/* Typing indicator */
+.typing-indicator {
+  display: flex; gap: 4px; align-items: center; padding: 4px;
+}
+.typing-dot {
+  width: 6px; height: 6px; background: var(--purple);
+  border-radius: 50%; animation: typing 1.2s ease infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+.plan-input-area {
+  padding: 16px 24px;
+  background: var(--bg-base);
+  border-top: 1px solid var(--border-subtle);
+  display: flex; gap: 10px; align-items: flex-end;
+}
+.plan-input {
+  flex: 1; background: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 10px 14px; color: var(--text-primary);
+  font-family: var(--font-ui); font-size: 13px;
+  resize: none; outline: none; min-height: 42px; max-height: 120px;
+  transition: var(--transition);
+  line-height: 1.5;
+}
+.plan-input:focus { border-color: var(--border-accent); background: var(--bg-float); }
+.plan-input::placeholder { color: var(--text-muted); }
+
+.send-btn {
+  width: 40px; height: 40px; border-radius: var(--radius-md);
+  background: var(--accent); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--spring); color: var(--bg-void);
+  font-size: 16px; flex-shrink: 0;
+}
+.send-btn:hover { background: #60C4FF; transform: scale(1.08); box-shadow: 0 4px 16px rgba(64,180,255,0.4); }
+
+/* Right: game plan panel */
+.plan-sidebar {
+  display: flex; flex-direction: column;
+  background: var(--bg-base); overflow: hidden;
+}
+.plan-sidebar-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.plan-sidebar-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+.plan-details {
+  flex: 1; overflow-y: auto; padding: 16px 20px;
+  display: flex; flex-direction: column; gap: 20px;
+}
+.plan-details::-webkit-scrollbar { width: 3px; }
+.plan-details::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+.plan-section { display: flex; flex-direction: column; gap: 8px; }
+.plan-section-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text-muted);
+}
+
+.plan-field {
+  background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md); padding: 10px 12px;
+  font-size: 13px; transition: var(--transition);
+}
+.plan-field:hover { border-color: var(--border-default); }
+.plan-field-label { font-size: 10px; color: var(--text-muted); margin-bottom: 3px; }
+.plan-field-value { color: var(--text-primary); font-weight: 500; }
+
+.plan-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.plan-tag {
+  padding: 4px 10px; border-radius: var(--radius-full);
+  font-size: 11px; font-weight: 600;
+  background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+.plan-tag.accent { background: var(--accent-soft); border-color: var(--border-accent); color: var(--accent); }
+.plan-tag.purple { background: var(--purple-soft); border-color: rgba(176,110,255,0.3); color: var(--purple); }
+.plan-tag.green { background: var(--green-soft); border-color: rgba(61,255,160,0.3); color: var(--green); }
+
+.plan-build-btn {
+  margin: 16px 20px;
+  padding: 14px; border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(176,110,255,0.2), rgba(64,180,255,0.2));
+  border: 1px solid rgba(176,110,255,0.4);
+  text-align: center; cursor: pointer;
+  transition: var(--transition); font-size: 14px;
+  font-weight: 700; font-family: var(--font-brand);
+  color: var(--text-primary);
+}
+.plan-build-btn:hover {
+  background: linear-gradient(135deg, rgba(176,110,255,0.35), rgba(64,180,255,0.35));
+  border-color: rgba(176,110,255,0.6);
+  box-shadow: 0 4px 24px rgba(176,110,255,0.2);
+  transform: translateY(-1px);
+}
+.plan-build-btn span { font-size: 20px; display: block; margin-bottom: 4px; }
+
+/* ═══════════════════════════ EDITOR SCREEN ══════════════════════════ */
+#editor { flex-direction: column; }
+.editor-body {
+  flex: 1; display: grid;
+  grid-template-columns: 240px 1fr 280px;
+  overflow: hidden;
+}
+
+/* Left sidebar: scene tree */
+.sidebar-left {
+  background: var(--bg-deep);
+  border-right: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.sidebar-header {
+  padding: 0 14px; height: 38px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+.sidebar-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+.sidebar-actions { display: flex; gap: 4px; }
+.icon-btn {
+  width: 22px; height: 22px; display: flex; align-items: center;
+  justify-content: center; border-radius: 4px; cursor: pointer;
+  color: var(--text-muted); transition: var(--transition); font-size: 12px;
+  border: 1px solid transparent;
+}
+.icon-btn:hover { color: var(--text-primary); background: var(--bg-hover); border-color: var(--border-subtle); }
+
+.scene-tree { flex: 1; overflow-y: auto; padding: 8px; }
+.scene-tree::-webkit-scrollbar { width: 3px; }
+.tree-item {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 8px; border-radius: var(--radius-sm);
+  cursor: pointer; font-size: 12px; color: var(--text-secondary);
+  transition: var(--transition);
+}
+.tree-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.tree-item.selected { background: var(--accent-soft); color: var(--accent); }
+.tree-indent { width: 16px; }
+.tree-icon { font-size: 12px; opacity: 0.7; }
+.tree-arrow { font-size: 8px; color: var(--text-muted); transition: var(--transition); }
+.tree-item.open .tree-arrow { transform: rotate(90deg); }
+
+/* Center: viewport */
+.viewport-area {
+  background: #0A0C10;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+.viewport-toolbar {
+  height: 36px; background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 12px; flex-shrink: 0;
+}
+.vp-tool-group {
+  display: flex; gap: 1px;
+  background: var(--border-subtle);
+  border-radius: var(--radius-sm); overflow: hidden;
+}
+.vp-tool {
+  padding: 4px 10px; font-size: 12px;
+  cursor: pointer; background: var(--bg-deep);
+  color: var(--text-muted); transition: var(--transition);
+  font-family: var(--font-ui); font-weight: 500;
+}
+.vp-tool:hover { background: var(--bg-hover); color: var(--text-primary); }
+.vp-tool.active { background: var(--accent-soft); color: var(--accent); }
+
+.vp-sep { width: 1px; height: 20px; background: var(--border-subtle); margin: 0 8px; }
+
+.vp-play-area { display: flex; gap: 4px; margin-left: auto; }
+.vp-play-btn {
+  padding: 4px 12px; border-radius: var(--radius-sm);
+  font-size: 12px; cursor: pointer;
+  background: var(--bg-raised); border: 1px solid var(--border-default);
+  color: var(--text-secondary); transition: var(--transition);
+  font-family: var(--font-ui); display: flex; align-items: center; gap: 5px;
+}
+.vp-play-btn:hover { background: var(--bg-float); color: var(--text-primary); }
+.vp-play-btn.play { background: var(--green-soft); color: var(--green); border-color: rgba(61,255,160,0.3); }
+.vp-play-btn.play:hover { background: rgba(61,255,160,0.2); }
+
+.viewport-canvas {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  position: relative;
+  background:
+    radial-gradient(ellipse 60% 40% at 50% 50%, rgba(64,180,255,0.04) 0%, transparent 70%),
+    repeating-linear-gradient(0deg, transparent, transparent 47px, rgba(64,180,255,0.03) 48px),
+    repeating-linear-gradient(90deg, transparent, transparent 47px, rgba(64,180,255,0.03) 48px),
+    #080A0E;
+}
+.viewport-placeholder {
+  text-align: center; color: var(--text-muted);
+}
+.viewport-placeholder p { font-size: 13px; margin-top: 8px; }
+
+.viewport-stats {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+  padding: 8px 12px; font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-secondary); line-height: 1.8;
+}
+.stat-good { color: var(--green); }
+.stat-warn { color: var(--amber); }
+
+/* Right sidebar: inspector */
+.sidebar-right {
+  background: var(--bg-deep);
+  border-left: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column;
+}
+.inspector-section {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.inspector-section-header {
+  padding: 8px 14px; display: flex; align-items: center;
+  gap: 6px; cursor: pointer;
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--text-muted);
+  transition: var(--transition);
+}
+.inspector-section-header:hover { background: var(--bg-hover); color: var(--text-secondary); }
+.inspector-section-arrow { margin-left: auto; font-size: 9px; transition: var(--transition); }
+.inspector-section.open .inspector-section-arrow { transform: rotate(180deg); }
+.inspector-props { padding: 8px 14px; display: flex; flex-direction: column; gap: 8px; }
+.prop-row { display: flex; align-items: center; gap: 8px; }
+.prop-label { font-size: 11px; color: var(--text-muted); width: 80px; flex-shrink: 0; }
+.prop-value {
+  flex: 1; background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  border-radius: 4px; padding: 4px 8px; font-size: 11px;
+  color: var(--text-secondary); font-family: var(--font-mono);
+}
+.prop-value.editable { cursor: text; color: var(--text-primary); }
+
+/* Bottom panels */
+.editor-bottom {
+  height: 180px; border-top: 1px solid var(--border-subtle);
+  display: flex; flex-direction: column;
+  background: var(--bg-void);
+}
+.bottom-tabs {
+  display: flex; padding: 0 8px;
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.bottom-tab {
+  padding: 7px 14px; font-size: 12px;
+  color: var(--text-muted); cursor: pointer;
+  border-bottom: 2px solid transparent; transition: var(--transition);
+  font-weight: 500;
+}
+.bottom-tab:hover { color: var(--text-secondary); }
+.bottom-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.bottom-content { flex: 1; padding: 8px 12px; overflow-y: auto; font-family: var(--font-mono); font-size: 11px; }
+.bottom-content::-webkit-scrollbar { width: 3px; }
+.bottom-content::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+.log-line { padding: 2px 0; line-height: 1.5; }
+.log-line.info { color: var(--text-secondary); }
+.log-line.ok { color: var(--green); }
+.log-line.warn { color: var(--amber); }
+.log-line.err { color: var(--red); }
+
+/* ═══════════════════════════ AI FLOATING WINDOW ═════════════════════ */
+.ai-float {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  width: 340px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-accent);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl), var(--glow-accent);
+  z-index: 500;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transform: translateY(16px) scale(0.95);
+  opacity: 0; pointer-events: none;
+  transition: var(--spring);
+}
+.ai-float.open {
+  transform: translateY(0) scale(1);
+  opacity: 1; pointer-events: all;
+}
+
+.ai-float-header {
+  padding: 14px 16px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; gap: 10px;
+}
+.ai-float-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+  animation: pulse 2s ease infinite;
+}
+.ai-float-title { font-size: 13px; font-weight: 700; }
+.ai-float-status {
+  font-size: 10px; color: var(--text-muted);
+  display: flex; align-items: center; gap: 4px;
+}
+.ai-float-status::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green); display: inline-block;
+  box-shadow: 0 0 6px var(--green);
+}
+.ai-float-close {
+  margin-left: auto; width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: pointer;
+  color: var(--text-muted); transition: var(--transition);
+  font-size: 12px;
+}
+.ai-float-close:hover { background: var(--bg-float); color: var(--text-primary); }
+
+.ai-float-messages {
+  height: 220px; overflow-y: auto; padding: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.ai-float-messages::-webkit-scrollbar { width: 3px; }
+.ai-float-messages::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+.ai-chip {
+  display: flex; gap: 8px; font-size: 12px; line-height: 1.5;
+}
+.ai-chip.user { justify-content: flex-end; }
+.ai-chip-text {
+  padding: 8px 12px; border-radius: var(--radius-lg);
+  max-width: 85%;
+}
+.ai-chip.ai .ai-chip-text {
+  background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  border-bottom-left-radius: 4px; color: var(--text-primary);
+}
+.ai-chip.user .ai-chip-text {
+  background: var(--purple-soft); border: 1px solid rgba(176,110,255,0.3);
+  border-bottom-right-radius: 4px; color: var(--text-primary);
+}
+
+.ai-float-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex; gap: 8px; align-items: center;
+}
+.ai-float-input {
+  flex: 1; background: var(--bg-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 7px 10px; color: var(--text-primary);
+  font-family: var(--font-ui); font-size: 12px;
+  outline: none; transition: var(--transition);
+}
+.ai-float-input:focus { border-color: var(--border-accent); }
+.ai-float-input::placeholder { color: var(--text-muted); }
+
+.ai-float-btn {
+  width: 30px; height: 30px; border-radius: var(--radius-sm);
+  background: var(--purple); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: var(--spring); font-size: 13px; color: white;
+}
+.ai-float-btn:hover { background: #C48AFF; transform: scale(1.1); }
+
+/* Drag files hint */
+.drop-zone-hint {
+  padding: 6px 12px;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+  background: var(--bg-deep);
+}
+
+/* AI toggle FAB */
+.ai-fab {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 499;
+  box-shadow: 0 4px 24px rgba(176,110,255,0.4);
+  font-size: 22px; transition: var(--spring);
+  border: none;
+}
+.ai-fab:hover { transform: scale(1.12); box-shadow: 0 6px 32px rgba(176,110,255,0.6); }
+.ai-fab.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
+
+/* ═══════════════════════════ AGENT MONITOR ══════════════════════════ */
+.agent-panel {
+  position: fixed; left: 24px; bottom: 24px;
+  width: 300px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  z-index: 400; overflow: hidden;
+  transform: translateX(-16px); opacity: 0; pointer-events: none;
+  transition: var(--spring);
+}
+.agent-panel.open {
+  transform: translateX(0); opacity: 1; pointer-events: all;
+}
+.agent-panel-header {
+  padding: 12px 16px;
+  background: var(--bg-raised);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.agent-panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+.agent-count {
+  padding: 2px 8px; border-radius: var(--radius-full);
+  background: var(--green-soft); color: var(--green);
+  font-size: 11px; font-weight: 700;
+  border: 1px solid rgba(61,255,160,0.3);
+}
+
+.agent-list { padding: 8px; display: flex; flex-direction: column; gap: 4px; max-height: 280px; overflow-y: auto; }
+.agent-list::-webkit-scrollbar { width: 3px; }
+.agent-list::-webkit-scrollbar-thumb { background: var(--border-default); }
+
+.agent-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: var(--radius-md);
+  background: var(--bg-raised); border: 1px solid var(--border-subtle);
+  cursor: pointer; transition: var(--transition);
+}
+.agent-item:hover { border-color: var(--border-default); background: var(--bg-float); }
+
+.agent-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  flex-shrink: 0; transition: var(--transition);
+}
+.agent-dot.idle { background: var(--text-muted); }
+.agent-dot.working { background: var(--amber); animation: pulse 1s ease infinite; box-shadow: 0 0 8px var(--amber); }
+.agent-dot.done { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.agent-dot.error { background: var(--red); }
+
+.agent-info { flex: 1; min-width: 0; }
+.agent-name { font-size: 12px; font-weight: 600; color: var(--text-primary); }
+.agent-task {
+  font-size: 10px; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 1px;
+}
+
+.agent-item .agent-time {
+  font-size: 10px; color: var(--text-muted);
+  font-family: var(--font-mono); flex-shrink: 0;
+}
+
+/* ═══════════════════════════ SETTINGS SCREEN ════════════════════════ */
+#settings {
+  background: var(--bg-deep);
+}
+.settings-layout {
+  flex: 1; display: grid;
+  grid-template-columns: 220px 1fr;
+  overflow: hidden;
+}
+.settings-nav {
+  background: var(--bg-void);
+  border-right: 1px solid var(--border-subtle);
+  padding: 16px 8px;
+  overflow-y: auto;
+}
+.settings-nav::-webkit-scrollbar { width: 3px; }
+.settings-group { margin-bottom: 24px; }
+.settings-group-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--text-hint);
+  padding: 0 8px; margin-bottom: 4px;
+}
+.settings-nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: var(--radius-md);
+  cursor: pointer; font-size: 13px; color: var(--text-muted);
+  transition: var(--transition); font-weight: 500;
+}
+.settings-nav-item:hover { background: var(--bg-hover); color: var(--text-secondary); }
+.settings-nav-item.active { background: var(--accent-soft); color: var(--accent); }
+.settings-nav-item .s-icon { font-size: 15px; }
+
+.settings-content {
+  padding: 28px 32px; overflow-y: auto;
+}
+.settings-content::-webkit-scrollbar { width: 4px; }
+.settings-content::-webkit-scrollbar-thumb { background: var(--border-default); border-radius: 2px; }
+
+.settings-page-title { font-family: var(--font-brand); font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.settings-page-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 28px; }
+
+.settings-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden; margin-bottom: 16px;
+}
+.settings-card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px; font-weight: 700; color: var(--text-primary);
+  display: flex; align-items: center; gap: 8px;
+}
+.settings-rows { padding: 4px 0; }
+.settings-row {
+  display: flex; align-items: center;
+  padding: 12px 18px; gap: 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: var(--transition);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { background: var(--bg-raised); }
+.settings-row-info { flex: 1; min-width: 0; }
+.settings-row-label { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+.settings-row-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+
+/* API key input */
+.api-key-input {
+  display: flex; gap: 8px; align-items: center;
+}
+.api-key-field {
+  background: var(--bg-raised); border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm); padding: 6px 10px;
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--text-primary); outline: none;
+  width: 200px; transition: var(--transition);
+}
+.api-key-field:focus { border-color: var(--border-accent); }
+.api-key-field::placeholder { color: var(--text-muted); }
+
+.s-badge {
+  padding: 3px 8px; border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.s-badge.connected { background: var(--green-soft); color: var(--green); border: 1px solid rgba(61,255,160,0.3); }
+.s-badge.disconnected { background: var(--bg-raised); color: var(--text-muted); border: 1px solid var(--border-subtle); }
+.s-badge.beta { background: var(--amber-soft); color: var(--amber); border: 1px solid rgba(255,184,48,0.3); }
+
+/* Toggle switch */
+.toggle { position: relative; display: inline-block; width: 36px; height: 20px; }
+.toggle input { display: none; }
+.toggle-slider {
+  position: absolute; inset: 0; background: var(--bg-hover);
+  border-radius: 10px; transition: var(--transition); cursor: pointer;
+  border: 1px solid var(--border-default);
+}
+.toggle-slider::before {
+  content: ''; position: absolute;
+  left: 2px; top: 2px;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--text-muted); transition: var(--transition);
+}
+.toggle input:checked + .toggle-slider { background: var(--accent-soft); border-color: var(--border-accent); }
+.toggle input:checked + .toggle-slider::before { background: var(--accent); transform: translateX(16px); }
+
+/* Store tab */
+.store-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px; padding: 20px;
+}
+.store-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden; cursor: pointer;
+  transition: var(--transition);
+}
+.store-card:hover { border-color: var(--border-default); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.store-card-art {
+  height: 100px; display: flex; align-items: center; justify-content: center;
+  font-size: 40px; background: var(--bg-float);
+}
+.store-card-info { padding: 12px; }
+.store-card-name { font-size: 13px; font-weight: 600; }
+.store-card-dev { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.store-card-price {
+  margin-top: 8px; font-size: 13px; font-weight: 700;
+  color: var(--accent);
+}
+.store-card-price.free { color: var(--green); }
+.store-card-rating { font-size: 10px; color: var(--amber); margin-top: 2px; }
+
+/* ═══════════════════════════ UTILITY ════════════════════════════════ */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.gap-4 { gap: 4px; }
+.gap-8 { gap: 8px; }
+.items-center { align-items: center; }
+.flex-1 { flex: 1; }
+.ml-auto { margin-left: auto; }
+
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: var(--radius-full);
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+}
+
+/* Bottom status bar */
+.status-bar {
+  height: 24px; flex-shrink: 0;
+  background: var(--bg-void);
+  border-top: 1px solid var(--border-subtle);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 0; font-family: var(--font-mono); font-size: 10px;
+  color: var(--text-muted);
+}
+.status-seg {
+  padding: 0 12px; height: 100%;
+  display: flex; align-items: center; gap: 5px;
+  border-right: 1px solid var(--border-subtle);
+  cursor: pointer; transition: var(--transition);
+}
+.status-seg:hover { background: var(--bg-hover); color: var(--text-secondary); }
+.status-seg.green .status-dot { background: var(--green); }
+.status-seg.amber .status-dot { background: var(--amber); }
+.status-seg.red .status-dot { background: var(--red); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; }
+.status-fps { margin-left: auto; padding-right: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ SPLASH SCREEN ═══════════════ -->
+<div class="screen active fade-in" id="splash">
+  <div class="splash-logo">
+    <div class="splash-icon">
+      <svg viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#40B4FF"/>
+            <stop offset="50%" stop-color="#B06EFF"/>
+            <stop offset="100%" stop-color="#FF5FA0"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#40B4FF" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="#B06EFF" stop-opacity="0.3"/>
+          </linearGradient>
+        </defs>
+        <!-- Outer ring -->
+        <circle cx="48" cy="48" r="44" stroke="url(#g1)" stroke-width="1.5" fill="url(#g2)"/>
+        <!-- Inner hexagon shape -->
+        <path d="M48 14 L74 29 L74 59 L48 74 L22 59 L22 29 Z" stroke="url(#g1)" stroke-width="1.5" fill="none"/>
+        <!-- G letter stylized -->
+        <path d="M36 38 L36 58 L54 58 L54 49 L46 49" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M36 38 L54 38" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <!-- Center dot -->
+        <circle cx="48" cy="48" r="3" fill="url(#g1)"/>
+      </svg>
+    </div>
+    <div class="splash-name">GENESIS</div>
+    <div class="splash-tagline">Where Worlds Begin</div>
+    <div class="splash-progress">
+      <div class="splash-progress-track">
+        <div class="splash-progress-bar"></div>
+      </div>
+      <div class="splash-status" id="splash-status">Initializing engine core...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAIN APP ═══════════════ -->
+<div class="screen" id="app">
+
+  <!-- Titlebar -->
+  <div class="titlebar">
+    <div class="titlebar-brand" onclick="navigate('home')">
+      <svg width="22" height="22" viewBox="0 0 96 96" fill="none">
+        <defs>
+          <linearGradient id="tb-g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#40B4FF"/>
+            <stop offset="100%" stop-color="#B06EFF"/>
+          </linearGradient>
+        </defs>
+        <path d="M48 8 L78 24 L78 64 L48 80 L18 64 L18 24 Z" stroke="url(#tb-g)" stroke-width="2" fill="rgba(64,180,255,0.1)"/>
+        <path d="M34 36 L34 60 L54 60 L54 51 L44 51" stroke="url(#tb-g)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <path d="M34 36 L54 36" stroke="url(#tb-g)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span class="titlebar-brand-name">GENESIS</span>
+    </div>
+
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="navigate('home')">
+        <span class="tab-dot"></span> Home
+      </div>
+      <div class="nav-tab" onclick="navigate('editor')">
+        <span class="tab-dot"></span> Editor
+      </div>
+      <div class="nav-tab" onclick="navigate('modeler')">
+        <span class="tab-dot"></span> 3D Modeler
+      </div>
+      <div class="nav-tab" onclick="navigate('studio')">
+        <span class="tab-dot"></span> Virtual Studio
+      </div>
+      <div class="nav-tab" onclick="navigate('ai-plan')">
+        <span class="tab-dot"></span> AI Studio
+      </div>
+      <div class="nav-tab" onclick="navigate('marketplace')">
+        <span class="tab-dot"></span> Marketplace
+      </div>
+      <div class="nav-tab" onclick="navigate('settings')">
+        <span class="tab-dot"></span> Settings
+      </div>
+    </div>
+
+    <div class="titlebar-right">
+      <button class="tb-btn" onclick="toggleAgentPanel()">🕵️ Agents <span id="agent-active-count" style="color:var(--green);font-weight:700">3</span></button>
+      <button class="tb-btn primary" onclick="openAiFab()">✨ Ask AI</button>
+      <div class="tb-avatar" title="ShadowWolf99">SW</div>
+      <div class="window-controls">
+        <div class="wc min"></div>
+        <div class="wc max"></div>
+        <div class="wc close"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen active" id="home" style="overflow:auto;position:relative;">
+    <div class="home-content">
+
+      <!-- Hero -->
+      <div class="home-hero fade-in">
+        <div class="hero-text">
+          <h1>Welcome back, <span>ShadowWolf99</span></h1>
+          <p>3 projects active · 2 agents running · Last session: 2h ago</p>
+        </div>
+        <div class="hero-actions">
+          <button class="hero-btn secondary" onclick="navigate('editor')">🔧 Open Editor</button>
+          <button class="hero-btn primary" onclick="openCreateModal()">+ Create Game</button>
+        </div>
+      </div>
+
+      <!-- Stats bar -->
+      <div>
+        <div class="section-header">
+          <span class="section-title">Your Stats</span>
+        </div>
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-value">7</div>
+            <div class="stat-label">Total Projects</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">3</div>
+            <div class="stat-label">In Development</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">128h</div>
+            <div class="stat-label">Build Time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value">2.4K</div>
+            <div class="stat-label">AI Assists</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active projects -->
+      <div>
+        <div class="section-header">
+          <span class="section-title">In Development</span>
+          <span class="section-action">View all →</span>
+        </div>
+        <div class="projects-grid">
+
+          <div class="project-card" onclick="navigate('editor')">
+            <div class="project-poster" style="--poster-gradient: linear-gradient(135deg, #1a0d2e, #3d1a6e)">
+              <div class="project-poster-bg"></div>
+              <div class="project-poster-icon">⚔️</div>
+              <div class="project-poster-badge dev">DEV</div>
+            </div>
+            <div class="project-info">
+              <div class="project-name">Shadow Realm: Chronicles</div>
+              <div class="project-meta">
+                <span class="project-genre">RPG</span>
+                <span class="project-time">2h ago</span>
+              </div>
+              <div class="project-progress"><div class="project-progress-fill" style="width:68%"></div></div>
+            </div>
+            <div class="project-actions">
+              <div class="proj-action accent" onclick="navigate('editor');event.stopPropagation()">Edit</div>
+              <div class="proj-action" onclick="navigate('ai-plan');event.stopPropagation()">AI</div>
+              <div class="proj-action">▶ Play</div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-poster" style="--poster-gradient: linear-gradient(135deg, #0d1f1a, #0a4030)">
+              <div class="project-poster-bg"></div>
+              <div class="project-poster-icon">🏎️</div>
+              <div class="project-poster-badge dev">DEV</div>
+            </div>
+            <div class="project-info">
+              <div class="project-name">Velocity Rush</div>
+              <div class="project-meta">
+                <span class="project-genre">Racing</span>
+                <span class="project-time">1d ago</span>
+              </div>
+              <div class="project-progress"><div class="project-progress-fill" style="width:32%"></div></div>
+            </div>
+            <div class="project-actions">
+              <div class="proj-action accent">Edit</div>
+              <div class="proj-action">AI</div>
+              <div class="proj-action">▶ Play</div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-poster" style="--poster-gradient: linear-gradient(135deg, #1a0a0a, #5a1515)">
+              <div class="project-poster-bg"></div>
+              <div class="project-poster-icon">👻</div>
+              <div class="project-poster-badge dev">DEV</div>
+            </div>
+            <div class="project-info">
+              <div class="project-name">Dread Mansion</div>
+              <div class="project-meta">
+                <span class="project-genre">Horror</span>
+                <span class="project-time">3d ago</span>
+              </div>
+              <div class="project-progress"><div class="project-progress-fill" style="width:15%"></div></div>
+            </div>
+            <div class="project-actions">
+              <div class="proj-action accent">Edit</div>
+              <div class="proj-action">AI</div>
+              <div class="proj-action">▶ Play</div>
+            </div>
+          </div>
+
+          <!-- Published -->
+          <div class="project-card">
+            <div class="project-poster" style="--poster-gradient: linear-gradient(135deg, #0a1a2e, #0d3060)">
+              <div class="project-poster-bg"></div>
+              <div class="project-poster-icon">🚀</div>
+              <div class="project-poster-badge done">LIVE</div>
+            </div>
+            <div class="project-info">
+              <div class="project-name">Nova Drift</div>
+              <div class="project-meta">
+                <span class="project-genre">Shooter</span>
+                <span class="project-time">2w ago</span>
+              </div>
+              <div class="project-progress"><div class="project-progress-fill" style="width:100%"></div></div>
+            </div>
+            <div class="project-actions">
+              <div class="proj-action">Update</div>
+              <div class="proj-action accent">Store</div>
+              <div class="proj-action">Stats</div>
+            </div>
+          </div>
+
+          <div class="project-card">
+            <div class="project-poster" style="--poster-gradient: linear-gradient(135deg, #1a1200, #3d2d00)">
+              <div class="project-poster-bg"></div>
+              <div class="project-poster-icon">🧩</div>
+              <div class="project-poster-badge done">LIVE</div>
+            </div>
+            <div class="project-info">
+              <div class="project-name">Cube Logic Pro</div>
+              <div class="project-meta">
+                <span class="project-genre">Puzzle</span>
+                <span class="project-time">1mo ago</span>
+              </div>
+              <div class="project-progress"><div class="project-progress-fill" style="width:100%"></div></div>
+            </div>
+            <div class="project-actions">
+              <div class="proj-action">Update</div>
+              <div class="proj-action accent">Store</div>
+              <div class="proj-action">Stats</div>
+            </div>
+          </div>
+
+          <div class="project-card" style="border: 1px solid var(--accent);">
+            <div class="project-poster" style="--poster-gradient: linear-gradient(135deg, #001a1a, #00d4ff)">
+              <div class="project-poster-bg"></div>
+              <div class="project-poster-icon">💠</div>
+              <div class="project-poster-badge new">NEW</div>
+            </div>
+            <div class="project-info">
+              <div class="project-name">Neon Nexus</div>
+              <div class="project-meta">
+                <span class="project-genre">Sci-Fi</span>
+                <span class="project-time">Just now</span>
+              </div>
+              <div class="project-progress"><div class="project-progress-fill" style="width:5%"></div></div>
+            </div>
+            <div class="project-actions">
+              <div class="proj-action accent" onclick="navigate('editor');event.stopPropagation()">Build</div>
+              <div class="proj-action">AI</div>
+              <div class="proj-action">▶ Play</div>
+            </div>
+          </div>
+
+          <!-- Create new -->
+          <div class="create-card" onclick="openCreateModal()">
+            <div class="create-card-icon">+</div>
+            <div class="create-card-text">New Project</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 3D Asset Gallery -->
+      <div>
+        <div class="section-header">
+          <span class="section-title">3D Asset Gallery</span>
+          <span class="section-action">Open Modeler →</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:12px;">
+          <div style="aspect-ratio:1;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+            <span style="font-size:40px;filter:drop-shadow(0 0 10px rgba(64,180,255,0.4))">💎</span>
+            <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Neon Crystal</span>
+            <span style="font-size:9px;color:var(--accent);">#40B4FF</span>
+          </div>
+          <div style="aspect-ratio:1;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+            <span style="font-size:40px;filter:drop-shadow(0 0 10px rgba(61,255,160,0.4))">🔋</span>
+            <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Power Cell</span>
+            <span style="font-size:9px;color:var(--green);">#3DFFA0</span>
+          </div>
+          <div style="aspect-ratio:1;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+            <span style="font-size:40px;filter:drop-shadow(0 0 10px rgba(255,77,106,0.4))">🛡️</span>
+            <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Energy Shield</span>
+            <span style="font-size:9px;color:var(--red);">#FF4D6A</span>
+          </div>
+          <div style="aspect-ratio:1;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;">
+            <span style="font-size:40px;filter:drop-shadow(0 0 10px rgba(176,110,255,0.4))">🔮</span>
+            <span style="font-size:11px;color:var(--text-secondary);font-weight:600;">Void Orb</span>
+            <span style="font-size:9px;color:var(--purple);">#B06EFF</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent AI activity -->
+      <div>
+        <div class="section-header">
+          <span class="section-title">Recent AI Activity</span>
+          <span class="section-action">View all →</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">
+            <span style="font-size:18px">🏰</span>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;">Interior Design Agent</div>
+              <div style="font-size:11px;color:var(--text-muted);">Designed "The Broken Crown Tavern" — 18 props placed, 6 lights, ambient sound assigned</div>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">12m ago</span>
+            <span class="badge" style="background:var(--green-soft);color:var(--green);border:1px solid rgba(61,255,160,0.3)">Done</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md);">
+            <span style="font-size:18px">🧑</span>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;">NPC Brain Agent</div>
+              <div style="font-size:11px;color:var(--text-muted);">Created "Elder Maren" — merchant with dark secret, unique voice, daily schedule, 40 dialogue lines</div>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">38m ago</span>
+            <span class="badge" style="background:var(--green-soft);color:var(--green);border:1px solid rgba(61,255,160,0.3)">Done</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-surface);border:1px solid var(--border-accent);border-radius:var(--radius-md);">
+            <span style="font-size:18px">🌍</span>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;">World Generator Agent</div>
+              <div style="font-size:11px;color:var(--text-muted);">Generating "Ashfall Plains" — biome chunks, flora scatter, weather zones...</div>
+            </div>
+            <span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">Live</span>
+            <span class="badge" style="background:var(--amber-soft);color:var(--amber);border:1px solid rgba(255,184,48,0.3)">Running</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Status bar -->
+    <div class="status-bar">
+      <div class="status-seg green"><div class="status-dot"></div>Engine OK</div>
+      <div class="status-seg green"><div class="status-dot"></div>Ollama: qwen2.5:7b</div>
+      <div class="status-seg amber"><div class="status-dot"></div>Cloud: Anthropic</div>
+      <div class="status-seg"><div class="status-dot"></div>v0.1.0</div>
+      <div class="status-seg status-fps" style="margin-left:auto;border-right:none">Genesis Engine — Where Worlds Begin</div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="screen" id="editor" style="overflow:hidden;position:relative;">
+    <div class="editor-body">
+
+      <!-- Scene Tree -->
+      <div class="sidebar-left">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Scene Tree</span>
+          <div class="sidebar-actions">
+            <div class="icon-btn" title="Add Node">+</div>
+            <div class="icon-btn" title="Search">🔍</div>
+          </div>
+        </div>
+        <div class="scene-tree">
+          <div class="tree-item selected"><span class="tree-icon">🌍</span> World Root</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">☀️</span> Sun</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">🌤️</span> Environment</div>
+          <div class="tree-item open"><span class="tree-indent"></span><span class="tree-arrow">▶</span><span class="tree-icon">🧑</span> Player</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">📷</span> Camera</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">💥</span> HitBox</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">📜</span> player.cv</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">🏰</span> Dungeon</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">🚪</span> Door_01</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">🚪</span> Door_02</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">💡</span> TorchLight_01</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">💡</span> TorchLight_02</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">🧙</span> NPC_ElderMaren</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">🧌</span> Enemy_Troll_01</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">🧌</span> Enemy_Troll_02</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-icon">🌊</span> WaterSurface</div>
+        </div>
+      </div>
+
+      <!-- Viewport -->
+      <div class="viewport-area">
+        <div class="viewport-toolbar">
+          <div class="vp-tool-group">
+            <div class="vp-tool active">Select</div>
+            <div class="vp-tool">Move</div>
+            <div class="vp-tool">Rotate</div>
+            <div class="vp-tool">Scale</div>
+          </div>
+          <div class="vp-sep"></div>
+          <div class="vp-tool-group">
+            <div class="vp-tool active">Perspective</div>
+            <div class="vp-tool">Top</div>
+            <div class="vp-tool">Front</div>
+            <div class="vp-tool">Side</div>
+          </div>
+          <div class="vp-sep"></div>
+          <div class="vp-tool-group">
+            <div class="vp-tool">Wire</div>
+            <div class="vp-tool active">Solid</div>
+            <div class="vp-tool">Material</div>
+            <div class="vp-tool">Lit</div>
+          </div>
+          <div class="vp-play-area">
+            <div class="vp-play-btn play" onclick="navigate('home')">▶ Play</div>
+            <div class="vp-play-btn">⏸ Pause</div>
+            <div class="vp-play-btn">⏹ Stop</div>
+          </div>
+        </div>
+        <div class="viewport-canvas">
+          <div class="viewport-placeholder">
+            <div style="font-size:56px;opacity:0.15">🎮</div>
+            <p style="opacity:0.4">3D Viewport — WGPU Renderer Active</p>
+            <p style="opacity:0.25;font-size:11px;margin-top:4px;">Open a scene to start editing</p>
+          </div>
+          <div class="viewport-stats">
+            <div>FPS <span class="stat-good">144</span></div>
+            <div>Draw calls <span class="stat-good">312</span></div>
+            <div>Tris <span class="stat-good">1.2M</span></div>
+            <div>VRAM <span class="stat-warn">3.8GB</span></div>
+            <div>Agents <span class="stat-good">3</span></div>
+          </div>
+        </div>
+
+        <!-- Bottom panel -->
+        <div class="editor-bottom">
+          <div class="bottom-tabs">
+            <div class="bottom-tab active">Console</div>
+            <div class="bottom-tab">Output</div>
+            <div class="bottom-tab">Assets</div>
+            <div class="bottom-tab">AI Log</div>
+            <div class="bottom-tab">Network</div>
+          </div>
+          <div class="bottom-content">
+            <div class="log-line ok">[00:00.000] Genesis Engine v0.1.0 initialized</div>
+            <div class="log-line ok">[00:00.021] WGPU renderer: Vulkan 1.3 backend ready</div>
+            <div class="log-line ok">[00:00.045] Rapier3D physics engine loaded</div>
+            <div class="log-line ok">[00:00.061] Ollama: qwen2.5:7b loaded (5.2GB)</div>
+            <div class="log-line info">[00:00.082] 32 agent council initialized</div>
+            <div class="log-line info">[00:00.094] Scene 'shadow_realm/main.scene' loading...</div>
+            <div class="log-line ok">[00:00.312] Scene loaded: 847 nodes, 12 agents active</div>
+            <div class="log-line warn">[00:01.240] NPC_Guard_04: NavMesh path not found — retrying</div>
+            <div class="log-line ok">[00:01.241] NPC_Guard_04: Path resolved via alternate route</div>
+            <div class="log-line info">>>> </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inspector -->
+      <div class="sidebar-right">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Inspector</span>
+          <div class="sidebar-actions">
+            <div class="icon-btn">📌</div>
+          </div>
+        </div>
+        <div class="inspector-section open">
+          <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
+            <span>📦</span> Node3D
+            <span class="inspector-section-arrow" style="margin-left:auto">▼</span>
+          </div>
+          <div class="inspector-props">
+            <div class="prop-row"><span class="prop-label">Name</span><div class="prop-value editable">World Root</div></div>
+            <div class="prop-row"><span class="prop-label">Visible</span><label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label></div>
+          </div>
+        </div>
+        <div class="inspector-section open">
+          <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
+            <span>📍</span> Transform
+            <span class="inspector-section-arrow" style="margin-left:auto">▼</span>
+          </div>
+          <div class="inspector-props">
+            <div class="prop-row"><span class="prop-label">Position</span><div class="prop-value editable">0, 0, 0</div></div>
+            <div class="prop-row"><span class="prop-label">Rotation</span><div class="prop-value editable">0°, 0°, 0°</div></div>
+            <div class="prop-row"><span class="prop-label">Scale</span><div class="prop-value editable">1, 1, 1</div></div>
+          </div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
+            <span>🎨</span> Material
+            <span class="inspector-section-arrow" style="margin-left:auto">▶</span>
+          </div>
+        </div>
+        <div class="inspector-section">
+          <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
+            <span>🤖</span> AI Agent
+            <span class="inspector-section-arrow" style="margin-left:auto">▶</span>
+          </div>
+        </div>
+        <!-- Holo AI Layers -->
+        <div class="inspector-section open">
+          <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
+            <span>💠</span> Holo AI Layers
+            <span class="inspector-section-arrow" style="margin-left:auto">▼</span>
+          </div>
+          <div class="inspector-props">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;align-items:center;gap:6px;padding:6px;background:var(--bg-raised);border-radius:4px;border:1px solid var(--border-accent);">
+                <span style="font-size:10px;color:var(--accent);font-weight:700;">ACTIVE</span>
+                <span style="font-size:11px;flex:1;">Combat_Tactics_v2</span>
+                <span style="font-size:10px;color:var(--text-muted);">P:10</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;padding:6px;background:var(--bg-raised);border-radius:4px;border:1px solid var(--border-subtle);opacity:0.6;">
+                <span style="font-size:10px;color:var(--text-muted);font-weight:700;">IDLE</span>
+                <span style="font-size:11px;flex:1;">Stealth_Behavior_Base</span>
+                <span style="font-size:10px;color:var(--text-muted);">P:0</span>
+              </div>
+              <button style="margin-top:4px;padding:4px;font-size:10px;background:var(--bg-float);border:1px solid var(--border-default);color:var(--text-secondary);cursor:pointer;border-radius:4px;">+ Stack New Layer</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-seg green"><div class="status-dot"></div>Scene: shadow_realm/main.scene</div>
+      <div class="status-seg"><div class="status-dot"></div>847 nodes</div>
+      <div class="status-seg green"><div class="status-dot"></div>FPS: 144</div>
+      <div class="status-seg" style="margin-left:auto;border:none;color:var(--accent);font-family:var(--font-mono)">← Home to return</div>
+    </div>
+  </div>
+
+  <!-- AI PLAN SCREEN -->
+  <div class="screen" id="ai-plan" style="overflow:hidden;position:relative;">
+    <div class="plan-header">
+      <div class="plan-back" onclick="navigate('home')">←</div>
+      <div>
+        <div class="plan-title">🤖 AI Game Planner</div>
+        <div class="plan-subtitle">Describe your game — AI will plan and build it</div>
+      </div>
+    </div>
+    <div class="plan-body">
+      <div class="plan-chat">
+        <div class="plan-messages" id="plan-messages">
+          <div class="msg ai">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              Hey! I'm your AI Game Designer. Tell me about the game you want to make — genre, theme, feel, mechanics — anything. I'll help you plan it out before we start building.<br><br>
+              No idea too big, no idea too small. What world do you want to create?
+            </div>
+          </div>
+          <div class="msg user">
+            <div class="msg-avatar" style="background:var(--accent-soft);border:1px solid var(--border-accent)">SW</div>
+            <div class="msg-bubble">
+              I want to make a dark fantasy RPG set in a world where the sun never rises. There's a resistance fighting against shadow creatures. Main character is a former soldier.
+            </div>
+          </div>
+          <div class="msg ai">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              <strong>Love it.</strong> A few questions to make this unique:<br><br>
+              1. Combat style? — Souls-like (hard, deliberate) or action-RPG (fluid, fast)?<br>
+              2. Story tone? — Grim &amp; hopeless OR dark but with moments of hope?<br>
+              3. World size? — Linear story OR open world to explore?<br><br>
+              Also — "former soldier" is interesting. What broke them? That backstory will shape how NPCs react to you throughout the game.
+            </div>
+          </div>
+          <div class="msg user">
+            <div class="msg-avatar" style="background:var(--accent-soft);border:1px solid var(--border-accent)">SW</div>
+            <div class="msg-bubble">
+              Souls-like combat. Dark but there's hope — the resistance gives people purpose. Semi-open world. The soldier lost their whole squad in a bad mission they ordered.
+            </div>
+          </div>
+          <div class="msg ai">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              <strong>That's a great foundation.</strong> Here's what I'm thinking:<br><br>
+              <strong>Title idea:</strong> "Eclipseborn" or "The Last Ember"<br>
+              <strong>Core theme:</strong> Guilt as strength — your worst failure becomes your greatest motivation<br>
+              <strong>Signature mechanic:</strong> "Command Echoes" — hear ghost voices of your lost squad giving tactical advice, but over-relying on them costs your sanity...<br><br>
+              I've updated the game plan panel. Want me to keep developing this or start building?
+            </div>
+          </div>
+          <div class="msg ai" id="typing-msg" style="display:none">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">
+              <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="plan-input-area">
+          <textarea class="plan-input" id="plan-input" placeholder="Continue planning your game..." rows="1" onkeydown="handlePlanKey(event)"></textarea>
+          <button class="send-btn" onclick="sendPlanMessage()">→</button>
+        </div>
+      </div>
+
+      <div class="plan-sidebar">
+        <div class="plan-sidebar-header">
+          <span class="plan-sidebar-title">Game Plan</span>
+          <span style="font-size:11px;color:var(--text-muted)">Auto-updating</span>
+        </div>
+        <div class="plan-details">
+          <div class="plan-section">
+            <div class="plan-section-label">Project</div>
+            <div class="plan-field"><div class="plan-field-label">Working Title</div><div class="plan-field-value">The Last Ember</div></div>
+          </div>
+          <div class="plan-section">
+            <div class="plan-section-label">Genre & Style</div>
+            <div class="plan-tags">
+              <span class="plan-tag accent">Souls-like RPG</span>
+              <span class="plan-tag purple">Dark Fantasy</span>
+              <span class="plan-tag">Semi-Open World</span>
+              <span class="plan-tag green">3rd Person</span>
+            </div>
+          </div>
+          <div class="plan-section">
+            <div class="plan-section-label">Core Mechanics</div>
+            <div class="plan-field"><div class="plan-field-label">Combat</div><div class="plan-field-value">Stamina-based, deliberate, punishing</div></div>
+            <div class="plan-field"><div class="plan-field-label">Signature</div><div class="plan-field-value">Command Echoes — squad ghost system</div></div>
+            <div class="plan-field"><div class="plan-field-label">Progression</div><div class="plan-field-value">Unlock gear by earning squad trust</div></div>
+          </div>
+          <div class="plan-section">
+            <div class="plan-section-label">World</div>
+            <div class="plan-field"><div class="plan-field-label">Setting</div><div class="plan-field-value">Eternal night, shadow-realm incursion</div></div>
+            <div class="plan-field"><div class="plan-field-label">Factions</div><div class="plan-field-value">The Ember Resistance, Shadow Cult, City-States</div></div>
+          </div>
+          <div class="plan-section">
+            <div class="plan-section-label">AI Agents Ready</div>
+            <div class="plan-tags">
+              <span class="plan-tag green">Story ✓</span>
+              <span class="plan-tag green">Combat ✓</span>
+              <span class="plan-tag green">World ✓</span>
+              <span class="plan-tag green">NPC ✓</span>
+              <span class="plan-tag green">Audio ✓</span>
+              <span class="plan-tag green">VFX ✓</span>
+            </div>
+          </div>
+        </div>
+        <div class="plan-build-btn" onclick="navigate('editor')">
+          <span>🚀</span>
+          Start Building with AI Agents
+          <div style="font-size:11px;color:var(--text-muted);font-weight:400;margin-top:4px">32 agents ready · Estimated: 15-30 mins</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-seg green"><div class="status-dot"></div>AI: Anthropic Claude</div>
+      <div class="status-seg"><div class="status-dot"></div>Plan: 6/12 sections</div>
+      <div class="status-seg" style="margin-left:auto;border:none;color:var(--text-muted)">← Home to return</div>
+    </div>
+  </div>
+
+  <!-- 3D MODELER SCREEN -->
+  <div class="screen" id="modeler" style="overflow:hidden;position:relative;">
+    <div class="editor-body">
+      <!-- Left: Tools & Outliner -->
+      <div class="sidebar-left">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Tools</span>
+        </div>
+        <div class="scene-tree">
+          <div class="tree-item active"><span class="tree-icon">📐</span> Select</div>
+          <div class="tree-item"><span class="tree-icon">📏</span> Measure</div>
+          <div class="tree-item"><span class="tree-icon">🔪</span> Knife</div>
+          <div class="tree-item"><span class="tree-icon">🌀</span> Spin</div>
+          <div class="tree-item"><span class="tree-icon">🤏</span> Sculpt</div>
+          <div class="vp-sep" style="width:100%;height:1px;margin:8px 0"></div>
+          <div class="tree-item active" style="color:var(--amber)"><span class="tree-icon">🦴</span> Rigging Mode</div>
+          <div class="tree-item"><span class="tree-icon">🖌️</span> Weight Paint</div>
+        </div>
+
+        <div class="sidebar-header" style="border-top:1px solid var(--border-subtle)">
+          <span class="sidebar-title">Skeleton</span>
+        </div>
+        <div class="scene-tree">
+          <div class="tree-item open"><span class="tree-arrow">▼</span><span class="tree-icon">🦴</span> root</div>
+          <div class="tree-item open"><span class="tree-indent"></span><span class="tree-arrow">▼</span><span class="tree-icon">🦴</span> spine</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">🦴</span> head</div>
+          <div class="tree-item open"><span class="tree-indent"></span><span class="tree-arrow">▼</span><span class="tree-icon">🦴</span> arm.L</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">🦴</span> hand.L</div>
+          <div class="tree-item open"><span class="tree-indent"></span><span class="tree-arrow">▼</span><span class="tree-icon">🦴</span> arm.R</div>
+          <div class="tree-item"><span class="tree-indent"></span><span class="tree-indent"></span><span class="tree-icon">🦴</span> hand.R</div>
+        </div>
+      </div>
+
+      <!-- Center: 3D Viewport -->
+      <div class="viewport-area">
+        <div class="viewport-toolbar">
+          <div class="vp-tool-group">
+            <div class="vp-tool active">Edit</div>
+            <div class="vp-tool">Sculpt</div>
+            <div class="vp-tool">Paint</div>
+          </div>
+          <div class="vp-sep"></div>
+          <div class="vp-tool" style="color:var(--green)" onclick="aiRig()">✨ Auto-Rig</div>
+          <div class="vp-play-area">
+             <div class="vp-play-btn">Pose Mode</div>
+          </div>
+        </div>
+        <div class="viewport-canvas" style="background:#121212">
+          <!-- Simulation of a 3D model with bones -->
+          <div style="position:relative;width:200px;height:400px;display:flex;align-items:center;justify-content:center;">
+             <!-- Neon Guardian Silhouette -->
+             <div style="width:120px;height:300px;background:rgba(64,180,255,0.2);border:2px solid var(--accent);border-radius:20px;position:relative;box-shadow:0 0 20px var(--accent-glow)">
+                <!-- Skeleton Overlay -->
+                <div style="position:absolute;top:10%;left:50%;width:4px;height:180px;background:var(--amber);transform:translateX(-50%);box-shadow:0 0 10px var(--amber)"></div>
+                <div style="position:absolute;top:20%;left:20%;width:80px;height:4px;background:var(--amber);box-shadow:0 0 10px var(--amber)"></div>
+                <div style="position:absolute;top:10%;left:50%;width:20px;height:20px;border-radius:50%;background:var(--amber);transform:translate(-50%, -50%);box-shadow:0 0 10px var(--amber)"></div>
+                <!-- Bone nodes -->
+                <div style="position:absolute;top:10%;left:50%;width:8px;height:8px;background:white;border-radius:50%;transform:translate(-50%, -50%)"></div>
+                <div style="position:absolute;top:20%;left:50%;width:8px;height:8px;background:white;border-radius:50%;transform:translate(-50%, -50%)"></div>
+                <div style="position:absolute;top:20%;left:20%;width:8px;height:8px;background:white;border-radius:50%;transform:translate(-50%, -50%)"></div>
+                <div style="position:absolute;top:20%;left:80%;width:8px;height:8px;background:white;border-radius:50%;transform:translate(-50%, -50%)"></div>
+             </div>
+             <div style="position:absolute;bottom:0;color:white;font-family:var(--font-mono);font-size:12px;text-align:center;">Neon_Guardian_Rig_v1</div>
+          </div>
+          <div class="viewport-stats">
+            <div>Polys <span class="stat-good">42.5K</span></div>
+            <div>Bones <span class="stat-good">24</span></div>
+            <div>Weights <span class="stat-good">OK</span></div>
+          </div>
+        </div>
+        <div class="editor-bottom">
+           <div class="bottom-tabs">
+             <div class="bottom-tab active">Dope Sheet</div>
+             <div class="bottom-tab">Action Editor</div>
+             <div class="bottom-tab">Drivers</div>
+           </div>
+           <div class="bottom-content" style="display:flex;align-items:center;justify-content:center;color:var(--text-muted)">
+             [ Timeline: 0 . . . . 10 . . . . 20 . . . . 30 . . . . 40 . . . . 50 . . . . 60 ]
+           </div>
+        </div>
+      </div>
+
+      <!-- Right: Properties -->
+      <div class="sidebar-right">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Bone Properties</span>
+        </div>
+        <div class="inspector-section open">
+          <div class="inspector-section-header"><span>🦴</span> Bone: spine</div>
+          <div class="inspector-props">
+            <div class="prop-row"><span class="prop-label">Length</span><div class="prop-value">0.82m</div></div>
+            <div class="prop-row"><span class="prop-label">Deform</span><label class="toggle"><input type="checkbox" checked><div class="toggle-slider"></div></label></div>
+          </div>
+        </div>
+        <div class="sidebar-header" style="border-top:1px solid var(--border-subtle)">
+          <span class="sidebar-title">Vertex Groups</span>
+        </div>
+        <div class="scene-tree" style="max-height:200px">
+           <div class="tree-item selected">spine (0.85)</div>
+           <div class="tree-item">arm.L (0.42)</div>
+           <div class="tree-item">arm.R (0.42)</div>
+           <div class="tree-item">head (1.0)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VIRTUAL STUDIO SCREEN -->
+  <div class="screen" id="studio" style="overflow:hidden;position:relative;">
+    <div class="editor-body">
+      <!-- Left: Cameras & Sources -->
+      <div class="sidebar-left">
+        <div class="sidebar-header">
+          <span class="sidebar-title">Performance Capture</span>
+        </div>
+        <div class="scene-tree">
+          <div class="tree-item active"><span class="tree-icon">📱</span> iPhone_15_Pro (Active)</div>
+          <div class="tree-item"><span class="tree-icon">📹</span> Webcam_Logitech</div>
+          <div class="tree-item"><span class="tree-icon">📷</span> Virtual_Cam_01</div>
+          <div class="vp-sep" style="width:100%;height:1px;margin:8px 0"></div>
+          <div class="tree-item"><span class="tree-icon">👤</span> Actor: ShadowWolf</div>
+          <div class="tree-item"><span class="tree-indent"></span><span style="color:var(--green)">●</span> Face Tracked</div>
+          <div class="tree-item"><span class="tree-indent"></span><span style="color:var(--green)">●</span> Body Tracked</div>
+        </div>
+
+        <div class="sidebar-header" style="border-top:1px solid var(--border-subtle)">
+          <span class="sidebar-title">Audio Mixer</span>
+        </div>
+        <div style="padding:12px;display:flex;gap:8px;justify-content:space-around;background:var(--bg-deep);">
+          <div style="width:12px;height:100px;background:var(--bg-raised);border-radius:6px;position:relative;">
+             <div style="position:absolute;bottom:0;width:100%;height:65%;background:var(--accent);border-radius:6px;box-shadow:0 0 10px var(--accent-glow)"></div>
+          </div>
+          <div style="width:12px;height:100px;background:var(--bg-raised);border-radius:6px;position:relative;">
+             <div style="position:absolute;bottom:0;width:100%;height:40%;background:var(--green);border-radius:6px;"></div>
+          </div>
+          <div style="width:12px;height:100px;background:var(--bg-raised);border-radius:6px;position:relative;">
+             <div style="position:absolute;bottom:0;width:100%;height:80%;background:var(--purple);border-radius:6px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Multi-Cam / Timeline -->
+      <div class="viewport-area">
+        <div class="viewport-toolbar">
+          <div class="vp-tool-group">
+            <div class="vp-tool active">Multicam</div>
+            <div class="vp-tool">Live Link</div>
+            <div class="vp-tool">Edit</div>
+          </div>
+          <div class="vp-sep"></div>
+          <div class="vp-play-area">
+             <div class="vp-play-btn" style="background:var(--red-soft);color:var(--red);border-color:var(--red-soft);">● REC</div>
+          </div>
+        </div>
+        <div class="viewport-canvas" style="background:#000;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:4px;padding:4px;">
+           <div style="background:var(--bg-raised);border:1px solid var(--border-default);display:flex;align-items:center;justify-content:center;position:relative;">
+              <span style="font-size:24px">📷</span>
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:var(--text-muted)">CAM_01 (Virtual)</span>
+           </div>
+           <div style="background:var(--bg-raised);border:1px solid var(--border-accent);display:flex;align-items:center;justify-content:center;position:relative;">
+              <span style="font-size:24px">📱</span>
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:var(--accent)">CAM_02 (iPhone - LIVE)</span>
+              <div style="position:absolute;bottom:8px;width:60%;height:80%;background:rgba(100,180,255,0.1);border:1px dashed var(--accent)"></div>
+           </div>
+           <div style="background:var(--bg-raised);border:1px solid var(--border-default);display:flex;align-items:center;justify-content:center;position:relative;">
+              <span style="font-size:24px">📹</span>
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:var(--text-muted)">CAM_03 (Webcam)</span>
+           </div>
+           <div style="background:var(--bg-raised);border:1px solid var(--border-default);display:flex;align-items:center;justify-content:center;position:relative;">
+              <span style="font-size:24px">🎬</span>
+              <span style="position:absolute;top:4px;left:8px;font-size:10px;color:var(--text-muted)">MASTER_PREVIEW</span>
+           </div>
+        </div>
+        <div class="editor-bottom" style="height:220px;">
+           <div class="bottom-tabs">
+             <div class="bottom-tab active">Video Timeline</div>
+             <div class="bottom-tab">Audio Tracks</div>
+             <div class="bottom-tab">Mocap Data</div>
+           </div>
+           <div class="bottom-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column;">
+             <!-- Timeline visualization -->
+             <div style="height:24px;background:var(--bg-deep);border-bottom:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 12px;font-size:10px;color:var(--text-muted);gap:40px;">
+                <span>00:00:00</span><span>00:00:05</span><span>00:00:10</span><span>00:00:15</span><span>00:00:20</span>
+             </div>
+             <div style="flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:4px;">
+                <div style="height:32px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:4px;display:flex;align-items:center;padding:0 8px;">
+                   <span style="width:80px;font-size:10px;color:var(--text-muted)">VIDEO_01</span>
+                   <div style="flex:1;height:20px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:2px;width:60%;"></div>
+                </div>
+                <div style="height:32px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:4px;display:flex;align-items:center;padding:0 8px;">
+                   <span style="width:80px;font-size:10px;color:var(--text-muted)">AUDIO_01</span>
+                   <div style="flex:1;height:12px;background:var(--green-soft);border:1px solid var(--green);border-radius:2px;width:80%;"></div>
+                </div>
+                <div style="height:32px;background:var(--bg-raised);border:1px solid var(--border-subtle);border-radius:4px;display:flex;align-items:center;padding:0 8px;">
+                   <span style="width:80px;font-size:10px;color:var(--text-muted)">AI_MOCAP</span>
+                   <div style="flex:1;height:12px;background:var(--purple-soft);border:1px solid var(--purple);border-radius:2px;width:45%;"></div>
+                </div>
+             </div>
+           </div>
+        </div>
+      </div>
+
+      <!-- Right: Inspector/Notes -->
+      <div class="sidebar-right">
+        <div class="sidebar-header">
+          <span class="sidebar-title">AI Director</span>
+        </div>
+        <div class="inspector-section open">
+          <div class="inspector-section-header"><span>🎬</span> Direction Notes</div>
+          <div class="inspector-props">
+            <div style="font-size:11px;color:var(--text-secondary);padding:4px;border-left:2px solid var(--amber);background:var(--bg-raised);margin-bottom:8px;">
+              "Actor needs to move closer to the light source at 00:08."
+            </div>
+            <div style="font-size:11px;color:var(--text-secondary);padding:4px;border-left:2px solid var(--green);background:var(--bg-raised);">
+              "Facial expression capture: 98% confidence."
+            </div>
+          </div>
+        </div>
+        <div class="sidebar-header" style="border-top:1px solid var(--border-subtle)">
+          <span class="sidebar-title">Export Settings</span>
+        </div>
+        <div class="inspector-props" style="padding:12px">
+           <div class="prop-row"><span class="prop-label">Format</span><div class="prop-value">ProRes 422</div></div>
+           <div class="prop-row"><span class="prop-label">Res</span><div class="prop-value">4K (3840x2160)</div></div>
+           <button style="width:100%;margin-top:12px;padding:8px;background:var(--accent);color:var(--bg-void);border:none;border-radius:4px;font-weight:700;cursor:pointer;">Render Cutscene</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MARKETPLACE SCREEN -->
+  <div class="screen" id="marketplace" style="overflow:hidden;position:relative;">
+    <div class="home-content">
+      <div class="section-header">
+        <span class="section-title">Genesis Marketplace</span>
+        <div class="hero-actions">
+          <button class="hero-btn secondary">Assets</button>
+          <button class="hero-btn secondary">Plugins</button>
+          <button class="hero-btn secondary">Templates</button>
+        </div>
+      </div>
+
+      <div class="store-grid">
+        <div class="store-card">
+          <div class="store-card-art">🌋</div>
+          <div class="store-card-info">
+            <div class="store-card-name">Magma Biome Pack</div>
+            <div class="store-card-dev">by VolcanicArts</div>
+            <div class="store-card-price">$14.99</div>
+            <div class="store-card-rating">⭐⭐⭐⭐⭐ (124)</div>
+          </div>
+        </div>
+        <div class="store-card">
+          <div class="store-card-art">🤖</div>
+          <div class="store-card-info">
+            <div class="store-card-name">Advanced NPC AI</div>
+            <div class="store-card-dev">by NeuralLogic</div>
+            <div class="store-card-price free">FREE</div>
+            <div class="store-card-rating">⭐⭐⭐⭐ (89)</div>
+          </div>
+        </div>
+        <div class="store-card">
+          <div class="store-card-art">🗡️</div>
+          <div class="store-card-info">
+            <div class="store-card-name">Ultimate Combat Kit</div>
+            <div class="store-card-dev">by FighterX</div>
+            <div class="store-card-price">$24.99</div>
+            <div class="store-card-rating">⭐⭐⭐⭐⭐ (56)</div>
+          </div>
+        </div>
+        <div class="store-card">
+          <div class="store-card-art">🌳</div>
+          <div class="store-card-info">
+            <div class="store-card-name">Procedural Forest</div>
+            <div class="store-card-dev">by EcoGen</div>
+            <div class="store-card-price">$9.99</div>
+            <div class="store-card-rating">⭐⭐⭐⭐⭐ (210)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS SCREEN -->
+  <div class="screen" id="settings" style="overflow:hidden;position:relative;">
+    <div class="settings-layout">
+      <div class="settings-nav">
+        <div class="settings-group">
+          <div class="settings-group-title">Account</div>
+          <div class="settings-nav-item active" onclick="showSettingsPage('ai-keys')"><span class="s-icon">🔑</span> AI API Keys</div>
+          <div class="settings-nav-item" onclick="showSettingsPage('account')"><span class="s-icon">👤</span> My Account</div>
+          <div class="settings-nav-item"><span class="s-icon">🎮</span> Gamer Profile</div>
+          <div class="settings-nav-item"><span class="s-icon">🔒</span> Privacy</div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">Engine</div>
+          <div class="settings-nav-item"><span class="s-icon">⚡</span> Performance</div>
+          <div class="settings-nav-item"><span class="s-icon">🎨</span> Theme & UI</div>
+          <div class="settings-nav-item"><span class="s-icon">🌍</span> Language</div>
+          <div class="settings-nav-item"><span class="s-icon">📁</span> Paths & Storage</div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">AI & Agents</div>
+          <div class="settings-nav-item"><span class="s-icon">🤖</span> Agent Settings</div>
+          <div class="settings-nav-item"><span class="s-icon">💻</span> Local Models</div>
+          <div class="settings-nav-item"><span class="s-icon">☁️</span> Cloud Compute</div>
+          <div class="settings-nav-item"><span class="s-icon">📊</span> Usage & Costs</div>
+        </div>
+        <div class="settings-group">
+          <div class="settings-group-title">Connections</div>
+          <div class="settings-nav-item"><span class="s-icon">📱</span> Phone Controller</div>
+          <div class="settings-nav-item"><span class="s-icon">📺</span> Screen Cast</div>
+          <div class="settings-nav-item"><span class="s-icon">🎬</span> Studio Cameras</div>
+          <div class="settings-nav-item"><span class="s-icon">🔌</span> Plugins</div>
+        </div>
+      </div>
+
+      <div class="settings-content" id="settings-content">
+        <!-- AI Keys page -->
+        <div id="page-ai-keys">
+          <div class="settings-page-title">🔑 AI API Keys</div>
+          <div class="settings-page-desc">Connect your AI providers. Keys are encrypted and stored locally. Add any provider — Genesis supports 30+ services.</div>
+
+          <div class="settings-card">
+            <div class="settings-card-header">🚀 Fast Inference (Low Latency)</div>
+            <div class="settings-rows">
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Groq</div>
+                  <div class="settings-row-desc">Fastest cloud inference — 400 tok/s. Great for real-time NPC dialogue.</div>
+                </div>
+                <span class="s-badge connected">Connected</span>
+                <div class="api-key-input">
+                  <input type="password" class="api-key-field" value="gsk_••••••••••••••••" placeholder="gsk_...">
+                  <div class="icon-btn" title="Remove">✕</div>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Cerebras</div>
+                  <div class="settings-row-desc">Dedicated AI chip — fastest Llama 3.3 70B (2200 tok/s). Premium inference.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="csk_...">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">DeepSeek</div>
+                  <div class="settings-row-desc">Excellent reasoning, very cheap. Great for planning and code generation.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="sk-...">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-header">🧠 Premium Models</div>
+            <div class="settings-rows">
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Anthropic (Claude)</div>
+                  <div class="settings-row-desc">Used for complex planning, story generation, and Architect Agent.</div>
+                </div>
+                <span class="s-badge connected">Connected</span>
+                <div class="api-key-input">
+                  <input type="password" class="api-key-field" value="sk-ant-••••••••••••••••" placeholder="sk-ant-...">
+                  <div class="icon-btn">✕</div>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">OpenAI</div>
+                  <div class="settings-row-desc">GPT-4o for vision tasks, DALL·E for image generation.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="sk-...">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">xAI (Grok)</div>
+                  <div class="settings-row-desc">Grok-2 for research agent web search and analysis.</div>
+                </div>
+                <span class="s-badge beta">Beta</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="xai-...">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-header">☁️ Cloud GPU Compute</div>
+            <div class="settings-rows">
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Google Colab</div>
+                  <div class="settings-row-desc">Free T4/A100 GPU. Run our notebook to connect — ngrok tunnel auto-configured.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <button style="padding:6px 14px;border-radius:var(--radius-sm);background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:12px;cursor:pointer;font-family:var(--font-ui);font-weight:600">Generate Notebook</button>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Kaggle</div>
+                  <div class="settings-row-desc">Free T4×2 GPUs. Username + key required.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="username:api_key">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">RunPod</div>
+                  <div class="settings-row-desc">Rent A100s or H100s on demand. Automatic connection via public endpoint.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="RunPod API key">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-card">
+            <div class="settings-card-header">🗣️ Voice & Specialized</div>
+            <div class="settings-rows">
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">ElevenLabs</div>
+                  <div class="settings-row-desc">High-quality TTS and voice cloning for NPC voices.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="ElevenLabs API key">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">fal.ai</div>
+                  <div class="settings-row-desc">FLUX image generation, ControlNet, video — for GPU Lab texture/concept art.</div>
+                </div>
+                <span class="s-badge disconnected">Not connected</span>
+                <div class="api-key-input">
+                  <input type="text" class="api-key-field" placeholder="fal.ai key">
+                  <button style="padding:5px 12px;border-radius:4px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--font-ui)">Connect</button>
+                </div>
+              </div>
+              <div class="settings-row">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">HuggingFace Token</div>
+                  <div class="settings-row-desc">Access gated models (Llama 3, etc.) and use HF Inference API.</div>
+                </div>
+                <span class="s-badge connected">Connected</span>
+                <div class="api-key-input">
+                  <input type="password" class="api-key-field" value="hf_••••••••••••••••" placeholder="hf_...">
+                  <div class="icon-btn">✕</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:16px;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);display:flex;align-items:center;gap:14px;">
+            <span style="font-size:20px">🔒</span>
+            <div>
+              <div style="font-size:13px;font-weight:600;">Keys encrypted with AES-256</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Stored locally only. Never sent to Genesis servers. Use environment variables for maximum security.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-seg"><div class="status-dot"></div>2 providers active</div>
+      <div class="status-seg green"><div class="status-dot"></div>Ollama: local</div>
+      <div class="status-seg" style="margin-left:auto;border:none;color:var(--text-muted)">← Home to return</div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ═══════════════ CREATE MODAL ═══════════════ -->
+<div class="modal-overlay" id="create-modal" onclick="if(event.target===this)closeCreateModal()">
+  <div class="modal create-choice">
+    <div class="create-choice-title">Create New Game</div>
+    <div class="create-choice-sub">Choose how you'd like to build your game</div>
+    <div class="choice-cards">
+      <div class="choice-card ai" onclick="closeCreateModal();navigate('ai-plan')">
+        <div class="choice-icon">🤖</div>
+        <div class="choice-title">AI Creates It</div>
+        <div class="choice-desc">
+          Describe your vision in plain words. The AI agent council plans, designs, and builds — you guide and customize.
+        </div>
+        <div class="choice-tags">
+          <span class="choice-tag">Fast</span>
+          <span class="choice-tag">Creative</span>
+          <span class="choice-tag">Any skill level</span>
+        </div>
+      </div>
+      <div class="choice-card manual" onclick="closeCreateModal();navigate('editor')">
+        <div class="choice-icon">🔧</div>
+        <div class="choice-title">Build It Yourself</div>
+        <div class="choice-desc">
+          Open the full editor with templates, code, visual nodes, and 3D tools. AI is still available to help you.
+        </div>
+        <div class="choice-tags">
+          <span class="choice-tag">Full control</span>
+          <span class="choice-tag">Dev mode</span>
+          <span class="choice-tag">AI assist</span>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:20px;text-align:center;">
+      <span style="font-size:12px;color:var(--text-muted)">Both modes have AI assistance available at any time</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ AI FLOATING WINDOW ═══════════════ -->
+<div class="ai-fab" id="ai-fab" onclick="openAiFab()">✨</div>
+
+<div class="ai-float" id="ai-float">
+  <div class="ai-float-header">
+    <div class="ai-float-avatar">🤖</div>
+    <div>
+      <div class="ai-float-title">Genesis AI</div>
+      <div class="ai-float-status">Ready to help</div>
+    </div>
+    <div class="ai-float-close" onclick="closeAiFab()">✕</div>
+  </div>
+  <div class="ai-float-messages" id="ai-float-msgs">
+    <div class="ai-chip ai">
+      <div class="ai-chip-text">Hi! I'm watching your project. Ask me anything — place objects, write scripts, generate assets, fix bugs — I'm here.</div>
+    </div>
+    <div class="ai-chip user">
+      <div class="ai-chip-text">Make the dungeon entrance more dramatic</div>
+    </div>
+    <div class="ai-chip ai">
+      <div class="ai-chip-text">On it! Adding: fog VFX, two point lights with orange glow, and adjusting the door material to aged obsidian. Done in 3s ✓</div>
+    </div>
+  </div>
+  <div class="drop-zone-hint">
+    📎 Drop files here to import
+  </div>
+  <div class="ai-float-input-area">
+    <input class="ai-float-input" id="ai-float-input" placeholder="Ask anything or give a command..." onkeydown="if(event.key==='Enter')sendAiFloat()">
+    <button class="ai-float-btn" onclick="sendAiFloat()">↑</button>
+  </div>
+</div>
+
+<!-- ═══════════════ AGENT MONITOR ═══════════════ -->
+<div class="agent-panel" id="agent-panel">
+  <div class="agent-panel-header">
+    <span class="agent-panel-title">Agents</span>
+    <span class="agent-count">3 active</span>
+  </div>
+  <div class="agent-list">
+    <div class="agent-item">
+      <div class="agent-dot working"></div>
+      <div class="agent-info">
+        <div class="agent-name">World Generator</div>
+        <div class="agent-task">Generating Ashfall Plains biome chunks...</div>
+      </div>
+      <div class="agent-time">2m 14s</div>
+    </div>
+    <div class="agent-item">
+      <div class="agent-dot done"></div>
+      <div class="agent-info">
+        <div class="agent-name">Interior Design</div>
+        <div class="agent-task">Tavern complete — 18 props placed</div>
+      </div>
+      <div class="agent-time">Done</div>
+    </div>
+    <div class="agent-item">
+      <div class="agent-dot working"></div>
+      <div class="agent-info">
+        <div class="agent-name">Story Agent</div>
+        <div class="agent-task">Writing dialogue for Elder Maren Act 2...</div>
+      </div>
+      <div class="agent-time">45s</div>
+    </div>
+    <div class="agent-item">
+      <div class="agent-dot idle"></div>
+      <div class="agent-info">
+        <div class="agent-name">Combat Agent</div>
+        <div class="agent-task">Idle — waiting for assignment</div>
+      </div>
+      <div class="agent-time">—</div>
+    </div>
+    <div class="agent-item">
+      <div class="agent-dot idle"></div>
+      <div class="agent-info">
+        <div class="agent-name">Music Agent</div>
+        <div class="agent-task">Idle — waiting for assignment</div>
+      </div>
+      <div class="agent-time">—</div>
+    </div>
+    <div class="agent-item">
+      <div class="agent-dot done"></div>
+      <div class="agent-info">
+        <div class="agent-name">NPC Brain</div>
+        <div class="agent-task">Elder Maren created — 40 dialogue lines</div>
+      </div>
+      <div class="agent-time">Done</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════ SPLASH SEQUENCE ═══════════════════════
+const splashMsgs = [
+  'Initializing engine core...',
+  'Loading WGPU renderer...',
+  'Starting AI agent council...',
+  'Loading project library...',
+  'Connecting to Ollama...',
+  'Ready.'
+];
+let splashIdx = 0;
+const splashInterval = setInterval(() => {
+  splashIdx++;
+  if (splashIdx < splashMsgs.length) {
+    document.getElementById('splash-status').textContent = splashMsgs[splashIdx];
+  }
+}, 420);
+
+setTimeout(() => {
+  clearInterval(splashInterval);
+  document.getElementById('splash').classList.remove('active');
+  const app = document.getElementById('app');
+  app.classList.add('active');
+  app.style.display = 'flex';
+  setTimeout(() => app.style.opacity = '1', 50);
+}, 2800);
+
+// ═══════════════════════ NAVIGATION ═══════════════════════
+function navigate(screen) {
+  // Update nav tabs
+  document.querySelectorAll('.nav-tab').forEach((t,i) => {
+    const screens = ['home','editor','modeler','studio','ai-plan','marketplace','settings'];
+    t.classList.toggle('active', screens[i] === screen);
+  });
+  // Show correct screen
+  document.querySelectorAll('#app > .screen').forEach(s => {
+    s.classList.toggle('active', s.id === screen);
+    if (s.id === screen) {
+      s.style.display = 'flex';
+      s.style.opacity = '1';
+      s.style.animation = 'fadeIn 0.3s ease';
+    } else {
+      s.style.display = 'none';
+    }
+  });
+}
+
+function showStore() {
+  // Show store tab on home for now
+  navigate('home');
+}
+
+function showSettingsPage(page) {
+  document.querySelectorAll('.settings-nav-item').forEach(i => i.classList.remove('active'));
+  event.currentTarget && event.currentTarget.classList.add('active');
+  // All point to ai-keys page for demo
+}
+
+// ═══════════════════════ MODALS ═══════════════════════
+function openCreateModal() {
+  document.getElementById('create-modal').classList.add('open');
+}
+function closeCreateModal() {
+  document.getElementById('create-modal').classList.remove('open');
+}
+
+// ═══════════════════════ AI FLOAT ═══════════════════════
+let aiFabOpen = false;
+function openAiFab() {
+  aiFabOpen = true;
+  document.getElementById('ai-float').classList.add('open');
+  document.getElementById('ai-fab').classList.add('hidden');
+  setTimeout(() => document.getElementById('ai-float-input').focus(), 300);
+}
+function closeAiFab() {
+  aiFabOpen = false;
+  document.getElementById('ai-float').classList.remove('open');
+  document.getElementById('ai-fab').classList.remove('hidden');
+}
+
+function sendAiFloat() {
+  const input = document.getElementById('ai-float-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('ai-float-msgs');
+  msgs.innerHTML += `<div class="ai-chip user"><div class="ai-chip-text">${text}</div></div>`;
+
+  const responses = [
+    "Got it! I'll handle that right away. Give me a moment...",
+    "Great idea! Applying changes to the scene now ✓",
+    "Done! I've updated the project. Want me to do anything else?",
+    "On it! Running the optimization pass now...",
+    "That's interesting — I can definitely implement that. Starting now!",
+  ];
+
+  setTimeout(() => {
+    const r = responses[Math.floor(Math.random() * responses.length)];
+    msgs.innerHTML += `<div class="ai-chip ai"><div class="ai-chip-text">${r}</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 900);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ═══════════════════════ AGENT PANEL ═══════════════════════
+let agentPanelOpen = false;
+function toggleAgentPanel() {
+  agentPanelOpen = !agentPanelOpen;
+  document.getElementById('agent-panel').classList.toggle('open', agentPanelOpen);
+}
+
+// ═══════════════════════ AI PLAN ═══════════════════════
+const planResponses = [
+  "Interesting! Let me add that to the game plan. This would work really well with the core mechanic we discussed.",
+  "Love that idea. I'm thinking we could tie this to the Command Echoes system — what do you think?",
+  "Good point. I'll refine the world design based on that. The biome generation agent can handle the environmental storytelling.",
+  "That changes things in a great way. Updating the story arc and NPC relationships now...",
+  "Perfect. When you're ready, I can start the build. The 32 agents are standing by.",
+];
+let planRespIdx = 0;
+
+function aiRig() {
+  const log = document.querySelector('#editor .bottom-content');
+  const line = document.createElement('div');
+  line.className = 'log-line ok';
+  line.textContent = `[${new Date().toLocaleTimeString()}] AI Modeler: Analyzing mesh 'Neon_Guardian'...`;
+  log.appendChild(line);
+
+  setTimeout(() => {
+    const line2 = document.createElement('div');
+    line2.className = 'log-line ok';
+    line2.textContent = `[${new Date().toLocaleTimeString()}] AI Modeler: Humanoid structure detected. Placing 24 bones...`;
+    log.appendChild(line2);
+  }, 1000);
+
+  setTimeout(() => {
+    const line3 = document.createElement('div');
+    line3.className = 'log-line ok';
+    line3.textContent = `[${new Date().toLocaleTimeString()}] AI Modeler: Auto-weighting complete. Rig ready.`;
+    log.appendChild(line3);
+  }, 2500);
+}
+
+function handlePlanKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendPlanMessage();
+  }
+}
+
+function sendPlanMessage() {
+  const input = document.getElementById('plan-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const msgs = document.getElementById('plan-messages');
+  msgs.innerHTML += `
+    <div class="msg user">
+      <div class="msg-avatar" style="background:var(--accent-soft);border:1px solid var(--border-accent)">SW</div>
+      <div class="msg-bubble">${text}</div>
+    </div>`;
+
+  // Show typing
+  document.getElementById('typing-msg').style.display = 'flex';
+  msgs.scrollTop = msgs.scrollHeight;
+
+  setTimeout(() => {
+    document.getElementById('typing-msg').style.display = 'none';
+    const r = planResponses[planRespIdx % planResponses.length];
+    planRespIdx++;
+    msgs.innerHTML += `
+      <div class="msg ai">
+        <div class="msg-avatar">🤖</div>
+        <div class="msg-bubble">${r}</div>
+      </div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1600);
+}
+
+// ═══════════════════════ KEYBOARD SHORTCUTS ═══════════════════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeCreateModal();
+    closeAiFab();
+  }
+  if ((e.ctrlKey || e.metaKey) && e.key === '/') {
+    e.preventDefault();
+    aiFabOpen ? closeAiFab() : openAiFab();
+  }
+});
+</script>
+</body>
+</html>
