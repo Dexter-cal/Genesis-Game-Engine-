@@ -1,4 +1,4 @@
-//! ChronoVerse Animation System
+//! Genesis Animation System
 //!
 //! Complete animation pipeline:
 //! - Skeletal animation (bone-based, GPU skinning)

@@ -1,4 +1,4 @@
-//! ChronoVerse Collaboration System
+//! Genesis Collaboration System
 //!
 //! Real-time multi-user collaboration for game development:
 //! - Multiple developers editing the same project simultaneously

@@ -1,6 +1,6 @@
 [package]
 name = "genesis-input"
-version = { workspace = true }
+version.workspace = true
 edition.workspace = true
 description = "Universal input system - gamepads, keyboard, mouse, VR, haptics, gyro, voice, MIDI"
 [dependencies]

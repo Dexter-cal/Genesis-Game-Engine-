@@ -1319,6 +1319,12 @@ body::before {
       <div class="nav-tab" onclick="navigate('modeler')">
         <span class="tab-dot"></span> 3D Modeler
       </div>
+        <div class="nav-tab" onclick="navigate('vfx')">
+          <span class="tab-dot"></span> VFX Editor
+        </div>
+        <div class="nav-tab" onclick="navigate('daw')">
+          <span class="tab-dot"></span> DAW
+        </div>
       <div class="nav-tab" onclick="navigate('studio')">
         <span class="tab-dot"></span> Virtual Studio
       </div>
@@ -1745,10 +1751,50 @@ body::before {
             <span class="inspector-section-arrow" style="margin-left:auto">▶</span>
           </div>
         </div>
-        <div class="inspector-section">
+        <div class="inspector-section open">
           <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
-            <span>🤖</span> AI Agent
-            <span class="inspector-section-arrow" style="margin-left:auto">▶</span>
+            <span>🤖</span> AI Agent Intelligence
+            <span class="inspector-section-arrow" style="margin-left:auto">▼</span>
+          </div>
+          <div class="inspector-props">
+            <div class="prop-row"><span class="prop-label">Confidence</span>
+              <div style="flex:1;height:4px;background:var(--bg-raised);border-radius:2px;">
+                <div style="width:92%;height:100%;background:var(--green);border-radius:2px;box-shadow:0 0 10px var(--green-soft)"></div>
+              </div>
+            </div>
+            <div class="prop-row"><span class="prop-label">Coherence</span>
+              <div style="flex:1;height:4px;background:var(--bg-raised);border-radius:2px;">
+                <div style="width:78%;height:100%;background:var(--accent);border-radius:2px;"></div>
+              </div>
+            </div>
+            <div class="prop-row"><span class="prop-label">Novelty</span>
+              <div style="flex:1;height:4px;background:var(--bg-raised);border-radius:2px;">
+                <div style="width:45%;height:100%;background:var(--purple);border-radius:2px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Neural Viz -->
+        <div class="inspector-section open">
+          <div class="inspector-section-header" onclick="this.parentElement.classList.toggle('open')">
+            <span>🧠</span> Neural Weight Viz
+            <span class="inspector-section-arrow" style="margin-left:auto">▼</span>
+          </div>
+          <div class="inspector-props" style="height:80px;position:relative;display:flex;align-items:center;justify-content:center;background:#000;overflow:hidden;border-radius:4px;">
+             <!-- Simplified SVG representation of neural weights -->
+             <svg width="100%" height="100%" viewBox="0 0 200 80">
+                <circle cx="20" cy="20" r="3" fill="var(--accent)" opacity="0.8" />
+                <circle cx="20" cy="40" r="3" fill="var(--accent)" opacity="0.8" />
+                <circle cx="20" cy="60" r="3" fill="var(--accent)" opacity="0.8" />
+                <circle cx="100" cy="30" r="3" fill="var(--purple)" opacity="0.8" />
+                <circle cx="100" cy="50" r="3" fill="var(--purple)" opacity="0.8" />
+                <circle cx="180" cy="40" r="3" fill="var(--green)" opacity="0.8" />
+                <line x1="20" y1="20" x2="100" y2="30" stroke="var(--accent)" stroke-width="0.5" opacity="0.3" />
+                <line x1="20" y1="40" x2="100" y2="30" stroke="var(--accent)" stroke-width="1" opacity="0.5" />
+                <line x1="20" y1="60" x2="100" y2="50" stroke="var(--accent)" stroke-width="0.2" opacity="0.1" />
+                <line x1="100" y1="30" x2="180" y2="40" stroke="var(--purple)" stroke-width="1.2" opacity="0.6" />
+                <line x1="100" y1="50" x2="180" y2="40" stroke="var(--purple)" stroke-width="0.8" opacity="0.4" />
+             </svg>
           </div>
         </div>
         <!-- Holo AI Layers -->
@@ -2139,6 +2185,72 @@ body::before {
     </div>
   </div>
 
+  <!-- VFX EDITOR SCREEN -->
+  <div class="screen" id="vfx" style="overflow:hidden;position:relative;">
+    <div class="editor-body">
+      <div class="sidebar-left">
+        <div class="sidebar-header"><span class="sidebar-title">Nodes</span></div>
+        <div class="scene-tree">
+          <div class="tree-item"><span class="tree-icon">💨</span> Particle Emitter</div>
+          <div class="tree-item"><span class="tree-icon">🌈</span> Color Ramp</div>
+          <div class="tree-item"><span class="tree-icon">🌀</span> Turbulence</div>
+          <div class="tree-item"><span class="tree-icon">💥</span> Collision</div>
+        </div>
+      </div>
+      <div class="viewport-area">
+        <div class="viewport-toolbar">
+          <div class="vp-tool-group"><div class="vp-tool active">Node Graph</div><div class="vp-tool">Preview</div></div>
+          <button class="vp-play-btn" style="margin-left:auto;color:var(--purple)">✨ AI Generate VFX</button>
+        </div>
+        <div class="viewport-canvas" style="background:#050505;">
+           <svg width="100%" height="100%">
+              <rect x="50" y="50" width="120" height="80" rx="8" fill="var(--bg-surface)" stroke="var(--purple)" stroke-width="1" />
+              <text x="60" y="75" fill="white" font-size="12">Emitter</text>
+              <rect x="250" y="100" width="120" height="80" rx="8" fill="var(--bg-surface)" stroke="var(--accent)" stroke-width="1" />
+              <text x="260" y="125" fill="white" font-size="12">Turbulence</text>
+              <line x1="170" y1="90" x2="250" y2="140" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4" />
+           </svg>
+        </div>
+      </div>
+      <div class="sidebar-right">
+        <div class="sidebar-header"><span class="sidebar-title">Node Properties</span></div>
+        <div class="inspector-props">
+          <div class="prop-row"><span class="prop-label">Density</span><div class="prop-value">500.0</div></div>
+          <div class="prop-row"><span class="prop-label">Lifetime</span><div class="prop-value">2.5s</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAW SCREEN -->
+  <div class="screen" id="daw" style="overflow:hidden;position:relative;">
+     <div style="flex:1;display:flex;flex-direction:column;background:var(--bg-void);">
+        <div class="viewport-toolbar">
+           <div class="vp-tool-group"><div class="vp-tool active">Arrangement</div><div class="vp-tool">Mixer</div></div>
+           <div style="margin-left:auto;display:flex;gap:12px;align-items:center;">
+              <span style="color:var(--amber);font-family:var(--font-mono);font-size:12px;">BPM: 124</span>
+              <button class="vp-play-btn" style="color:var(--green)">✨ AI Compose</button>
+           </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:8px;">
+           <div style="height:60px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 20px;">
+              <span style="width:120px;font-weight:700;color:var(--accent);">Lead Synth</span>
+              <div style="flex:1;height:30px;background:var(--accent-glow);border-radius:4px;position:relative;overflow:hidden;">
+                 <svg width="100%" height="30"><path d="M0 15 Q 10 5, 20 15 T 40 15 T 60 15 T 80 15" stroke="var(--accent)" fill="none" /></svg>
+              </div>
+           </div>
+           <div style="height:60px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 20px;">
+              <span style="width:120px;font-weight:700;color:var(--purple);">Shadow Bass</span>
+              <div style="flex:1;height:30px;background:var(--purple-soft);border-radius:4px;"></div>
+           </div>
+           <div style="height:60px;background:var(--bg-surface);border-radius:8px;border:1px solid var(--border-subtle);display:flex;align-items:center;padding:0 20px;">
+              <span style="width:120px;font-weight:700;color:var(--green);">Ambient Pads</span>
+              <div style="flex:1;height:30px;background:var(--green-soft);border-radius:4px;"></div>
+           </div>
+        </div>
+     </div>
+  </div>
+
   <!-- MARKETPLACE SCREEN -->
   <div class="screen" id="marketplace" style="overflow:hidden;position:relative;">
     <div class="home-content">
@@ -2468,6 +2580,11 @@ body::before {
   <div class="drop-zone-hint">
     📎 Drop files here to import
   </div>
+  <div style="padding:4px 12px;display:flex;gap:6px;background:var(--bg-deep);border-top:1px solid var(--border-subtle);overflow-x:auto;" id="ai-suggestions">
+     <span style="font-size:10px;padding:2px 8px;background:var(--accent-soft);border:1px solid var(--border-accent);color:var(--accent);border-radius:var(--radius-full);cursor:pointer;white-space:nowrap;" onclick="useAiSuggestion('Spawn Skeletons')">Spawn Skeletons</span>
+     <span style="font-size:10px;padding:2px 8px;background:var(--purple-soft);border:1px solid rgba(176,110,255,0.3);color:var(--purple);border-radius:var(--radius-full);cursor:pointer;white-space:nowrap;" onclick="useAiSuggestion('Fix Lighting')">Fix Lighting</span>
+     <span style="font-size:10px;padding:2px 8px;background:var(--bg-raised);border:1px solid var(--border-subtle);color:var(--text-muted);border-radius:var(--radius-full);cursor:pointer;white-space:nowrap;" onclick="useAiSuggestion('Optimize Meshes')">Optimize Meshes</span>
+  </div>
   <div class="ai-float-input-area">
     <input class="ai-float-input" id="ai-float-input" placeholder="Ask anything or give a command..." onkeydown="if(event.key==='Enter')sendAiFloat()">
     <button class="ai-float-btn" onclick="sendAiFloat()">↑</button>
@@ -2563,7 +2680,7 @@ setTimeout(() => {
 function navigate(screen) {
   // Update nav tabs
   document.querySelectorAll('.nav-tab').forEach((t,i) => {
-    const screens = ['home','editor','modeler','studio','ai-plan','marketplace','settings'];
+    const screens = ['home','editor','modeler','vfx','daw','studio','ai-plan','marketplace','settings'];
     t.classList.toggle('active', screens[i] === screen);
   });
   // Show correct screen
@@ -2610,6 +2727,11 @@ function closeAiFab() {
   aiFabOpen = false;
   document.getElementById('ai-float').classList.remove('open');
   document.getElementById('ai-fab').classList.remove('hidden');
+}
+
+function useAiSuggestion(text) {
+  document.getElementById('ai-float-input').value = text;
+  sendAiFloat();
 }
 
 function sendAiFloat() {

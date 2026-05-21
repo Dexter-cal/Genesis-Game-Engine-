@@ -1,6 +1,6 @@
 [package]
 name = "genesis-network"
-version = { workspace = true }
+version.workspace = true
 edition.workspace = true
 description = "Multiplayer networking - co-op, PvP, split-screen, online, spectator, voice chat"
 [dependencies]

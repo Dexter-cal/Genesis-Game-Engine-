@@ -1,4 +1,4 @@
-//! ChronoVerse Studio — Virtual Production Suite
+//! Genesis Studio — Virtual Production Suite
 //!
 //! A complete virtual production environment like Unreal's MetaHuman + Live Link:
 //!

@@ -1,6 +1,6 @@
 //! Base Agent trait and context
 //!
-//! Every agent in ChronoVerse implements the Agent trait.
+//! Every agent in Genesis implements the Agent trait.
 //! Agents are async, event-driven, and token-budget-aware.
 
 use std::sync::Arc;

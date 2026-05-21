@@ -1,6 +1,6 @@
 [package]
 name = "genesis-world-streaming"
-version = { workspace = true }
+version.workspace = true
 edition.workspace = true
 [dependencies]
 serde = { version="1", features=["derive"] }

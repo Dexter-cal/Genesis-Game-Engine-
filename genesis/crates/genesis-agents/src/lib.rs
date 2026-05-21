@@ -4,7 +4,11 @@ use std::collections::{HashMap,VecDeque};
 use chrono::{DateTime,Utc};
 
 pub mod holo;
+pub mod self_improve;
+pub mod code_fix;
+
 use crate::holo::HoloStack;
+use crate::self_improve::SelfImproveAgent;
 
 // ═══ AGENT TYPES ══════════════════════════════════════════════════
 #[derive(Debug,Clone,PartialEq,Serialize,Deserialize)]
@@ -329,11 +333,6 @@ impl Agent {
         tracing::debug!("Task assigned to {}: {}", self.kind.name(), task_id);
     }
 
-    pub fn register_tool(&mut self, tool: AgentTool) {
-        tracing::info!("Agent {} registered new tool: {}", self.id, tool.name);
-        // In a real impl, this would add to a local tool registry
-    }
-
     pub fn start_next_task(&mut self) -> Option<String> {
         if let Some(id) = self.task_queue.pop_front() {
             self.current_task = Some(id.clone());
@@ -382,6 +381,7 @@ pub struct AgentCouncil {
     pub active_count:  u32,
     pub total_tasks:   u64,
     pub global_budget: TokenBudget,
+    pub improver:      SelfImproveAgent,
 }
 
 impl AgentCouncil {
@@ -391,6 +391,7 @@ impl AgentCouncil {
             orchestrator:None, enabled:true, auto_assign:true, max_parallel:4,
             active_count:0, total_tasks:0,
             global_budget: TokenBudget::new(1_000_000, 10.0),
+            improver: SelfImproveAgent::new(),
         };
         council.spawn_default_agents();
         council
@@ -477,16 +478,22 @@ impl AgentCouncil {
 
     pub fn tick(&mut self, _delta:f32) {
         if !self.enabled { return; }
+
+        // Check for self-improvement opportunities
+        let mut improvements = Vec::new();
+        for agent in self.agents.values() {
+            if let Some(imp) = self.improver.assess(agent) {
+                improvements.push(imp);
+            }
+        }
+        for imp in improvements {
+            tracing::info!("Agent Improvement Proposed: {} -> {}", imp.agent_name, imp.assessment);
+        }
+
         // Auto-start queued tasks for idle agents
         for agent in self.agents.values_mut() {
             if matches!(agent.status, AgentStatus::Idle) && !agent.task_queue.is_empty() {
                 agent.start_next_task();
-            }
-
-            // Self-improvement cycle
-            if agent.total_errors > 10 {
-                tracing::info!("Agent {} is self-improving due to high error rate", agent.id);
-                agent.total_errors = 0; // Reset after "learning"
             }
         }
     }

@@ -1,6 +1,6 @@
-//! ChronoVerse Cross-Platform Installer & Package Manager
+//! Genesis Cross-Platform Installer & Package Manager
 //!
-//! Installs ChronoVerse on any OS:
+//! Installs Genesis on any OS:
 //! - Windows 10/11 (x64, ARM64)
 //! - macOS 12+ (Intel + Apple Silicon)
 //! - Ubuntu / Debian / Linux Mint
@@ -265,8 +265,8 @@ impl Default for InstallConfig {
     fn default() -> Self {
         let sys = SystemInfo::detect();
         let install_path = match sys.os_family {
-            OsFamily::Windows => PathBuf::from("C:\\Program Files\\ChronoVerse"),
-            OsFamily::MacOs   => PathBuf::from("/Applications/ChronoVerse.app"),
+            OsFamily::Windows => PathBuf::from("C:\\Program Files\\Genesis"),
+            OsFamily::MacOs   => PathBuf::from("/Applications/Genesis.app"),
             _                 => PathBuf::from("/opt/genesis"),
         };
 
@@ -378,7 +378,7 @@ impl PlatformInstaller {
         let deps = self.linux_deps();
 
         format!(r#"#!/bin/bash
-# ChronoVerse Linux Installer
+# Genesis Linux Installer
 # Supports: Ubuntu/Debian, Arch, Fedora, NixOS, Steam Deck
 
 set -e
@@ -387,7 +387,7 @@ CV_VERSION="0.1.0"
 CV_DOWNLOAD="https://releases.genesis.io/linux/$CV_VERSION/genesis-linux-x86_64.tar.gz"
 
 echo "╔══════════════════════════════════════╗"
-echo "║   ChronoVerse Engine Installer       ║"
+echo "║   Genesis Engine Installer       ║"
 echo "║   v$CV_VERSION                              ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
@@ -414,8 +414,8 @@ echo "→ Creating install directory: $INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
 sudo chown $USER:$USER "$INSTALL_DIR"
 
-# Download ChronoVerse
-echo "→ Downloading ChronoVerse..."
+# Download Genesis
+echo "→ Downloading Genesis..."
 if command -v curl &> /dev/null; then
     curl -L --progress-bar "$CV_DOWNLOAD" -o /tmp/genesis.tar.gz
 elif command -v wget &> /dev/null; then
@@ -441,7 +441,7 @@ ollama pull qwen2.5:1.5b 2>/dev/null || echo "AI models will be downloaded on fi
 if [ -d ~/.local/share/applications ]; then
     cat > ~/.local/share/applications/genesis.desktop << 'DESKTOP'
 [Desktop Entry]
-Name=ChronoVerse
+Name=Genesis
 Comment=AI-First Game Engine
 Exec={install_path}/genesis
 Icon={install_path}/icons/genesis.png
@@ -474,7 +474,7 @@ sudo ln -sf "$INSTALL_DIR/bin/genesis-cli" /usr/local/bin/genesis-cli 2>/dev/nul
     echo "Note: Run 'source $SHELL_RC' to use genesis-cli"
 
 echo ""
-echo "✅ ChronoVerse installed successfully!"
+echo "✅ Genesis installed successfully!"
 echo ""
 echo "→ Launch from applications menu or run:"
 echo "  $INSTALL_DIR/genesis"
@@ -524,7 +524,7 @@ fi"#.to_string()
 # ];"#.to_string()
             }
             Some(LinuxDistro::SteamOs) => {
-                r#"# Steam Deck: ChronoVerse is pre-configured for Steam OS
+                r#"# Steam Deck: Genesis is pre-configured for Steam OS
 # No additional dependencies needed"#.to_string()
             }
             _ => {
@@ -537,12 +537,12 @@ fi"#.to_string()
     fn macos_script(&self) -> String {
         let install_path = self.config.install_path.display();
         format!(r#"#!/bin/bash
-# ChronoVerse macOS Installer
+# Genesis macOS Installer
 # Supports: macOS 12 Monterey+, Intel + Apple Silicon
 
 set -e
 
-echo "ChronoVerse macOS Installer"
+echo "Genesis macOS Installer"
 echo "==========================="
 
 # Check macOS version
@@ -577,47 +577,47 @@ if ! command -v ollama &> /dev/null; then
 fi
 
 # Download DMG
-echo "Downloading ChronoVerse..."
-curl -L -# "$DOWNLOAD_URL" -o /tmp/ChronoVerse.dmg
+echo "Downloading Genesis..."
+curl -L -# "$DOWNLOAD_URL" -o /tmp/Genesis.dmg
 
 # Mount and install
 echo "Installing..."
-hdiutil attach /tmp/ChronoVerse.dmg -quiet
-cp -R "/Volumes/ChronoVerse/ChronoVerse.app" /Applications/
-hdiutil detach "/Volumes/ChronoVerse" -quiet
-rm /tmp/ChronoVerse.dmg
+hdiutil attach /tmp/Genesis.dmg -quiet
+cp -R "/Volumes/Genesis/Genesis.app" /Applications/
+hdiutil detach "/Volumes/Genesis" -quiet
+rm /tmp/Genesis.dmg
 
 # Remove quarantine attribute
-xattr -rd com.apple.quarantine /Applications/ChronoVerse.app 2>/dev/null || true
+xattr -rd com.apple.quarantine /Applications/Genesis.app 2>/dev/null || true
 
 # CLI tool
-sudo ln -sf /Applications/ChronoVerse.app/Contents/MacOS/genesis-cli /usr/local/bin/genesis-cli
+sudo ln -sf /Applications/Genesis.app/Contents/MacOS/genesis-cli /usr/local/bin/genesis-cli
 
 # Register file associations
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister \
-    -f /Applications/ChronoVerse.app
+    -f /Applications/Genesis.app
 
 # Pull base AI model
 echo "Downloading base AI model..."
 ollama pull qwen2.5:1.5b 2>/dev/null || true
 
 echo ""
-echo "✅ ChronoVerse installed to /Applications/ChronoVerse.app"
+echo "✅ Genesis installed to /Applications/Genesis.app"
 echo "Launch from Applications folder or Spotlight."
 "#)
     }
 
     fn windows_script(&self) -> String {
-        r#"# ChronoVerse Windows Installer (PowerShell)
+        r#"# Genesis Windows Installer (PowerShell)
 # Run as Administrator for best results
 
 param(
-    [string]$InstallPath = "C:\Program Files\ChronoVerse",
+    [string]$InstallPath = "C:\Program Files\Genesis",
     [switch]$Silent,
     [switch]$WithModels
 )
 
-Write-Host "ChronoVerse Windows Installer" -ForegroundColor Cyan
+Write-Host "Genesis Windows Installer" -ForegroundColor Cyan
 Write-Host "==============================" -ForegroundColor Cyan
 
 # Check Windows version
@@ -650,9 +650,9 @@ if (-not $Vulkan) {
     # DirectX fallback will be used
 }
 
-# Download ChronoVerse installer
-Write-Host "Downloading ChronoVerse..." -ForegroundColor Green
-$InstallerPath = "$env:TEMP\ChronoVerseSetup.exe"
+# Download Genesis installer
+Write-Host "Downloading Genesis..." -ForegroundColor Green
+$InstallerPath = "$env:TEMP\GenesisSetup.exe"
 $ProgressPreference = 'SilentlyContinue'
 Invoke-WebRequest -Uri $DownloadUrl -OutFile $InstallerPath
 $ProgressPreference = 'Continue'
@@ -674,15 +674,15 @@ if (-not $OllamaCheck) {
 
 # Add to PATH
 $CurrentPath = [System.Environment]::GetEnvironmentVariable("PATH", "Machine")
-if ($CurrentPath -notlike "*ChronoVerse*") {
+if ($CurrentPath -notlike "*Genesis*") {
     [System.Environment]::SetEnvironmentVariable(
         "PATH", "$CurrentPath;$InstallPath\bin", "Machine")
     Write-Host "Added to system PATH" -ForegroundColor Green
 }
 
 # Create file association for .chrono files
-New-Item -Path "HKCU:\Software\Classes\.chrono" -Force | Set-ItemProperty -Name "(Default)" -Value "ChronoVerseProject"
-New-Item -Path "HKCU:\Software\Classes\ChronoVerseProject\shell\open\command" -Force |
+New-Item -Path "HKCU:\Software\Classes\.chrono" -Force | Set-ItemProperty -Name "(Default)" -Value "GenesisProject"
+New-Item -Path "HKCU:\Software\Classes\GenesisProject\shell\open\command" -Force |
     Set-ItemProperty -Name "(Default)" -Value "`"$InstallPath\genesis.exe`" `"%1`""
 
 # Download AI models if requested
@@ -693,13 +693,13 @@ if ($WithModels) {
 
 # Create Start Menu shortcut
 $WshShell = New-Object -ComObject WScript.Shell
-$Shortcut = $WshShell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\ChronoVerse.lnk")
+$Shortcut = $WshShell.CreateShortcut("$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Genesis.lnk")
 $Shortcut.TargetPath = "$InstallPath\genesis.exe"
 $Shortcut.IconLocation = "$InstallPath\genesis.ico"
 $Shortcut.Save()
 
 Write-Host ""
-Write-Host "✅ ChronoVerse installed successfully!" -ForegroundColor Green
+Write-Host "✅ Genesis installed successfully!" -ForegroundColor Green
 Write-Host "Launch from Start Menu or run: genesis" -ForegroundColor White
 "#.to_string()
     }

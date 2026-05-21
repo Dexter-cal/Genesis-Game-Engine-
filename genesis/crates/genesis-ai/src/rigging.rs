@@ -1,4 +1,4 @@
-//! ChronoVerse AI Rigging & Motion Capture System
+//! Genesis AI Rigging & Motion Capture System
 //!
 //! Three ways to create animation rigs and animations:
 //!

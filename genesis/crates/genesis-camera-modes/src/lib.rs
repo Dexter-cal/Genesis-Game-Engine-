@@ -1,4 +1,4 @@
-//! ChronoVerse Camera Modes — Universal Camera OS
+//! Genesis Camera Modes — Universal Camera OS
 //!
 //! 40+ camera mode combinations from one system.
 //! Works with any input driver — webcam only, gamepad only, or hybrid.

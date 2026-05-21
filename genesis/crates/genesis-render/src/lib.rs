@@ -1,4 +1,4 @@
-//! ChronoVerse Renderer
+//! Genesis Renderer
 //!
 //! Built on WGPU — runs on Vulkan, Metal, DX12, and WebGPU.
 //!

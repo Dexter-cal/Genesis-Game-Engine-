@@ -131,7 +131,7 @@ impl InteriorDesignAgent {
                 id: "interior_design".to_string(),
                 name: "Interior Design Agent".to_string(),
                 description: "Autonomously designs interiors: furniture placement, lighting, materials, props. Can generate new assets and create custom furniture.".to_string(),
-                system_prompt: r#"You are the Interior Design Agent for ChronoVerse.
+                system_prompt: r#"You are the Interior Design Agent for Genesis.
 You design believable, atmospheric, story-rich interiors for game spaces.
 
 Your design principles:

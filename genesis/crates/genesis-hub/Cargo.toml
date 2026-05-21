@@ -1,8 +1,8 @@
 [package]
 name = "genesis-hub"
-version = { workspace = true }
+version.workspace = true
 edition.workspace = true
-description = "ChronoVerse Hub - platform connections, bots, remote creation via chat"
+description = "Genesis Hub - platform connections, bots, remote creation via chat"
 [dependencies]
 tokio = { workspace = true }
 serde = { workspace = true }

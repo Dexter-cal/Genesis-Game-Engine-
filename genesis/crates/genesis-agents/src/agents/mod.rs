@@ -38,7 +38,6 @@ pub mod marketing { pub use super::world::MarketingAgent; }
 pub mod chaos { pub use super::world::ChaosAgent; }
 pub mod import_agent { pub use super::world::ImportAgent; }
 pub mod gpu_lab { pub use super::world::GpuLabAgent; }
-pub mod self_improve;
 
 pub fn create_all_agents() -> Vec<Box<dyn crate::base::Agent>> {
     vec![
@@ -74,4 +73,3 @@ pub fn create_all_agents() -> Vec<Box<dyn crate::base::Agent>> {
         Box::new(GpuLabAgent::new()),
     ]
 }
-pub mod test_self_improve;

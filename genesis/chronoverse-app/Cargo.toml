@@ -1,8 +1,8 @@
 [package]
-name = "chronoverse-app"
-version = { workspace = true }
+name = "genesis-app"
+version.workspace = true
 edition.workspace = true
-description = "ChronoVerse — The AI-First Game Engine"
+description = "Genesis — The AI-First Game Engine"
 
 [[bin]]
 path = "src/main.rs"
@@ -22,12 +22,12 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 async-trait.workspace = true
 
-chronoverse-core      = { workspace = true }
-chronoverse-ecs       = { workspace = true }
-chronoverse-math      = { workspace = true }
-chronoverse-physics   = { workspace = true }
-chronoverse-agents    = { workspace = true }
-chronoverse-input     = { workspace = true }
-chronoverse-network   = { workspace = true }
-chronoverse-scripting = { workspace = true }
-chronoverse-hub       = { workspace = true }
+genesis-core      = { workspace = true }
+genesis-ecs       = { workspace = true }
+genesis-math      = { workspace = true }
+genesis-physics   = { workspace = true }
+genesis-agents    = { workspace = true }
+genesis-input     = { workspace = true }
+genesis-network   = { workspace = true }
+genesis-scripting = { workspace = true }
+genesis-hub       = { workspace = true }

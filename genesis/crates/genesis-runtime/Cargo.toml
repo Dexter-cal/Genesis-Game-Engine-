@@ -1,6 +1,6 @@
 [package]
 name = "genesis-runtime"
-version = { workspace = true }
+version.workspace = true
 edition.workspace = true
 [dependencies]
 serde = { workspace = true }

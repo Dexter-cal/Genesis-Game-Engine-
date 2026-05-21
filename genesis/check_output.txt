@@ -1,8 +1,8 @@
-error: failed to load manifest for workspace member `/app/genesis/crates/chronoverse-physics`
+error: failed to load manifest for workspace member `/app/genesis/crates/genesis-physics`
 referenced by workspace at `/app/genesis/Cargo.toml`
 
 Caused by:
-  failed to parse manifest at `/app/genesis/crates/chronoverse-physics/Cargo.toml`
+  failed to parse manifest at `/app/genesis/crates/genesis-physics/Cargo.toml`
 
 Caused by:
   error inheriting `crossbeam` from workspace root manifest's `workspace.dependencies.crossbeam`

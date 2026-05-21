@@ -1,4 +1,4 @@
-//! ChronoVerse Phone-as-Controller System
+//! Genesis Phone-as-Controller System
 //!
 //! Allows a phone to act as a full game controller:
 //! 1. Player opens game → QR code appears

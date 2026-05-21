@@ -1,4 +1,4 @@
-//! ChronoVerse Mechanics System
+//! Genesis Mechanics System
 //!
 //! Pure game mechanics that don't fit neatly elsewhere:
 //! - Gear systems (interlocking gears, ratio calculations)

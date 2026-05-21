@@ -1,6 +1,6 @@
-//! ChronoVerse Built-in Script Functions & Standard Library
+//! Genesis Built-in Script Functions & Standard Library
 //!
-//! Every scripting language in ChronoVerse has access to these
+//! Every scripting language in Genesis has access to these
 //! built-in functions and objects. Like Godot's @GlobalScope,
 //! these are available everywhere without imports.
 //!
@@ -78,7 +78,7 @@ pub enum ApiCategory {
     Signal, Timer, Scene, Game, Animation, Time,
 }
 
-/// The complete ChronoVerse built-in API surface
+/// The complete Genesis built-in API surface
 pub struct BuiltinApi {
     pub functions: Vec<BuiltinDoc>,
     pub classes: Vec<BuiltinClass>,

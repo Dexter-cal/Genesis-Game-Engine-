@@ -1,4 +1,4 @@
-//! ChronoVerse VFX Compositor — Advanced Studio Effects
+//! Genesis VFX Compositor — Advanced Studio Effects
 //!
 //! Everything for the virtual production pipeline:
 //! - Node-based compositing (like Nuke/After Effects)

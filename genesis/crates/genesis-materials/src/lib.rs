@@ -1,4 +1,4 @@
-//! ChronoVerse Material System
+//! Genesis Material System
 //!
 //! Complete PBR material system covering every rendering use case:
 //!
@@ -149,7 +149,7 @@ pub enum UvProjection { Uv, Planar, Triplanar, Spherical, Cylindrical, Box }
 
 // ─── The Master Material ──────────────────────────────────────────────────────
 
-/// The complete material definition for any surface in ChronoVerse
+/// The complete material definition for any surface in Genesis
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Material {
     pub id: String,

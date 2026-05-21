@@ -1,4 +1,4 @@
-//! ChronoVerse 3D Modeler — AI-Powered Built-in Blender Alternative
+//! Genesis 3D Modeler — AI-Powered Built-in Blender Alternative
 //!
 //! A complete 3D modeling studio built into the engine.
 //! AI-assisted so even non-artists can create 3D content.
@@ -362,7 +362,7 @@ impl AiModelingAgent {
                 id: "ai_modeler".to_string(),
                 name: "AI Modeling Agent".to_string(),
                 description: "Guides 3D modeling process. Can generate models from text/images, auto-retopo, UV unwrap, and assist artists step-by-step.".to_string(),
-                system_prompt: r#"You are the AI Modeling Agent inside ChronoVerse's built-in 3D modeler.
+                system_prompt: r#"You are the AI Modeling Agent inside Genesis's built-in 3D modeler.
 
 You help users create 3D models through:
 1. TEXT TO 3D: Generate base meshes from descriptions
