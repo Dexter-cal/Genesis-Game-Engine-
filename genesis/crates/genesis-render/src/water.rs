@@ -1,4 +1,4 @@
-//! Genesis Water & Fluid System
+//! ChronoVerse Water & Fluid System
 //!
 //! Covers every type of water in games:
 //! - FFT-based ocean simulation (realistic deep ocean waves)

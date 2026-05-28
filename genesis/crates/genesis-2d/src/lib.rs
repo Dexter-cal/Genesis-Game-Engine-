@@ -1,4 +1,4 @@
-//! Genesis 2D Engine
+//! ChronoVerse 2D Engine
 //!
 //! Full 2D game support alongside 3D — not an afterthought.
 //! Like Godot, we support BOTH 2D and 3D in the same engine.
@@ -55,7 +55,7 @@ use genesis_math::{vec2::Vec2, color::Color};
 // Like Godot's nodes, but everything is Rust-native
 // ═══════════════════════════════════════════════════════════════════════════
 
-/// Every object in Genesis is a Node.
+/// Every object in ChronoVerse is a Node.
 /// Nodes form a scene tree. Children inherit parent transforms.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
@@ -92,7 +92,7 @@ impl Default for NodeTransform {
     }
 }
 
-/// All node types in Genesis
+/// All node types in ChronoVerse
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum NodeType {
     // ─── ROOT / CONTAINERS ────────────────────────────────────────────────

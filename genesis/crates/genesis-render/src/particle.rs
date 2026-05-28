@@ -1,4 +1,4 @@
-//! Genesis GPU Particle System
+//! ChronoVerse GPU Particle System
 //!
 //! Handles ALL particle-based effects:
 //! - Fire, smoke, sparks

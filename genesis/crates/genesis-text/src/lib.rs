@@ -1,4 +1,4 @@
-//! Genesis Text & Typography System
+//! ChronoVerse Text & Typography System
 //!
 //! Complete text rendering for games:
 //! - SDF (Signed Distance Field) font rendering — crisp at any size

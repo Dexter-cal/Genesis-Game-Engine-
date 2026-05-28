@@ -1,20 +1,20 @@
 #!/usr/bin/env bash
 # ╔═══════════════════════════════════════════════════════════════════╗
-# ║           Genesis — Universal One-Command Installer           ║
+# ║           ChronoVerse — Universal One-Command Installer           ║
 # ║                                                                   ║
-# ║   Usage:  curl -fsSL https://get.genesis.io | bash            ║
+# ║   Usage:  curl -fsSL https://get.chronoverse.io | bash            ║
 # ║   Or:     bash install.sh                                         ║
 # ║   Or:     bash install.sh --silent --no-models                    ║
 # ╚═══════════════════════════════════════════════════════════════════╝
 #
 # What this does:
 #   1. Detects your OS, architecture, and GPU
-#   2. Checks if Genesis was previously installed (remembers this PC)
+#   2. Checks if ChronoVerse was previously installed (remembers this PC)
 #   3. Downloads the correct binary for your system
 #   4. Installs all dependencies (Vulkan, audio, video, AI)
 #   5. Downloads base AI models (optional)
 #   6. Creates desktop shortcuts and file associations
-#   7. Launches Genesis
+#   7. Launches ChronoVerse
 #
 # Supports:
 #   Windows 10/11 (via WSL/PowerShell detection)
@@ -29,10 +29,10 @@ set -euo pipefail
 
 # ─── Configuration ───────────────────────────────────────────────────────────
 CV_VERSION="${CV_VERSION:-0.1.0}"
-CV_REGISTRY="https://releases.genesis.io"
-CV_REGISTRY_CDN="https://cdn.genesis.io"
-CV_MODELS_REGISTRY="https://models.genesis.io"
-CV_STATE_DIR="${HOME}/.config/genesis"
+CV_REGISTRY="https://releases.chronoverse.io"
+CV_REGISTRY_CDN="https://cdn.chronoverse.io"
+CV_MODELS_REGISTRY="https://models.chronoverse.io"
+CV_STATE_DIR="${HOME}/.config/chronoverse"
 CV_STATE_FILE="${CV_STATE_DIR}/install_state.json"
 CV_INSTALL_DIR="${CV_INSTALL_DIR:-}"
 CV_LOG="${CV_STATE_DIR}/install.log"
@@ -108,7 +108,7 @@ get_state() {
 
 is_installed() {
     local install_path=$(get_state "install_path")
-    [[ -n "$install_path" ]] && [[ -f "${install_path}/genesis" || -f "${install_path}/genesis.exe" ]]
+    [[ -n "$install_path" ]] && [[ -f "${install_path}/chronoverse" || -f "${install_path}/chronoverse.exe" ]]
 }
 
 get_machine_id() {
@@ -284,7 +284,7 @@ install_models() {
     log "You can install more models in Project Settings → AI → Model Manager"
 }
 
-# ─── Download & Install Genesis ──────────────────────────────────────────
+# ─── Download & Install ChronoVerse ──────────────────────────────────────────
 determine_install_dir() {
     if [[ -n "$CV_INSTALL_DIR" ]]; then
         echo "$CV_INSTALL_DIR"
@@ -292,9 +292,9 @@ determine_install_dir() {
     fi
     local os=$(detect_os)
     case $os in
-        macos)   echo "$HOME/Applications/Genesis" ;;
-        linux)   echo "$HOME/.local/share/genesis" ;;
-        *)       echo "$HOME/Genesis" ;;
+        macos)   echo "$HOME/Applications/ChronoVerse" ;;
+        linux)   echo "$HOME/.local/share/chronoverse" ;;
+        *)       echo "$HOME/ChronoVerse" ;;
     esac
 }
 
@@ -303,32 +303,32 @@ download_binary() {
     local arch=$(detect_arch)
     local install_dir="$1"
 
-    local filename="genesis-${os}-${arch}-${CV_VERSION}"
+    local filename="chronoverse-${os}-${arch}-${CV_VERSION}"
     [[ "$os" == "windows" ]] && filename="${filename}.exe" || filename="${filename}.tar.gz"
 
     local url="${CV_REGISTRY}/${INSTALL_CHANNEL}/${filename}"
 
-    log "Downloading Genesis ${CV_VERSION} (${os}/${arch})..."
+    log "Downloading ChronoVerse ${CV_VERSION} (${os}/${arch})..."
 
     mkdir -p "$install_dir"
 
     if command -v curl &>/dev/null; then
-        curl -L --progress-bar "$url" -o "/tmp/genesis_download" 2>&1
+        curl -L --progress-bar "$url" -o "/tmp/chronoverse_download" 2>&1
     elif command -v wget &>/dev/null; then
-        wget -q --show-progress "$url" -O "/tmp/genesis_download"
+        wget -q --show-progress "$url" -O "/tmp/chronoverse_download"
     else
         die "Neither curl nor wget found. Please install one and retry."
     fi
 
     if [[ "$os" != "windows" && "$filename" == *.tar.gz ]]; then
         log "Extracting..."
-        tar -xzf "/tmp/genesis_download" -C "$install_dir"
-        rm "/tmp/genesis_download"
-        chmod +x "$install_dir/genesis"
-        chmod +x "$install_dir/genesis-cli"
+        tar -xzf "/tmp/chronoverse_download" -C "$install_dir"
+        rm "/tmp/chronoverse_download"
+        chmod +x "$install_dir/chronoverse"
+        chmod +x "$install_dir/chronoverse-cli"
     fi
 
-    ok "Genesis downloaded to $install_dir"
+    ok "ChronoVerse downloaded to $install_dir"
 }
 
 create_desktop_entry() {
@@ -337,24 +337,24 @@ create_desktop_entry() {
 
     if [[ "$os" == "linux" ]]; then
         mkdir -p "$HOME/.local/share/applications"
-        cat > "$HOME/.local/share/applications/genesis.desktop" << EOF
+        cat > "$HOME/.local/share/applications/chronoverse.desktop" << EOF
 [Desktop Entry]
-Name=Genesis
+Name=ChronoVerse
 GenericName=Game Engine
 Comment=The AI-First Game Engine
-Exec=${install_dir}/genesis %f
-Icon=${install_dir}/icons/genesis.png
+Exec=${install_dir}/chronoverse %f
+Icon=${install_dir}/icons/chronoverse.png
 Terminal=false
 Type=Application
 Categories=Development;GameDevelopment;
-MimeType=application/x-genesis-project;
+MimeType=application/x-chronoverse-project;
 Keywords=game;engine;ai;development;
 StartupNotify=true
-StartupWMClass=genesis
+StartupWMClass=chronoverse
 EOF
         # Register file types
         if command -v xdg-mime &>/dev/null; then
-            xdg-mime default genesis.desktop application/x-genesis-project 2>/dev/null || true
+            xdg-mime default chronoverse.desktop application/x-chronoverse-project 2>/dev/null || true
         fi
         ok "Desktop shortcut created"
     fi
@@ -376,14 +376,14 @@ add_to_path() {
     fi
 
     if [[ -n "$shell_rc" ]]; then
-        if ! grep -q "genesis" "$shell_rc" 2>/dev/null; then
+        if ! grep -q "chronoverse" "$shell_rc" 2>/dev/null; then
             echo "" >> "$shell_rc"
-            echo "# Genesis Game Engine" >> "$shell_rc"
+            echo "# ChronoVerse Game Engine" >> "$shell_rc"
             echo "export PATH=\"${bin_dir}:\$PATH\"" >> "$shell_rc"
             ok "Added to PATH in $shell_rc"
-            log "Run 'source $shell_rc' or restart your terminal to use 'genesis-cli'"
+            log "Run 'source $shell_rc' or restart your terminal to use 'chronoverse-cli'"
         else
-            ok "Genesis already in PATH"
+            ok "ChronoVerse already in PATH"
         fi
     fi
 }
@@ -398,7 +398,7 @@ check_existing_installation() {
 
         echo ""
         echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
-        echo -e "${GREEN}Genesis is already installed on this machine!${RESET}"
+        echo -e "${GREEN}ChronoVerse is already installed on this machine!${RESET}"
         echo ""
         echo -e "  Location:  ${BOLD}${install_path}${RESET}"
         echo -e "  Version:   ${BOLD}${installed_version:-unknown}${RESET}"
@@ -428,8 +428,8 @@ check_existing_installation() {
         echo ""
 
         if [[ "$NO_LAUNCH" != "true" ]]; then
-            log "Launching Genesis..."
-            exec "${install_path}/genesis"
+            log "Launching ChronoVerse..."
+            exec "${install_path}/chronoverse"
         fi
         exit 0
     fi
@@ -475,14 +475,14 @@ main() {
 
     # Create log directory
     mkdir -p "$CV_STATE_DIR"
-    echo "=== Genesis Install Log ===" > "$CV_LOG"
+    echo "=== ChronoVerse Install Log ===" > "$CV_LOG"
     echo "Date: $(date)" >> "$CV_LOG"
 
     # Check if already installed
     check_existing_installation
 
     echo ""
-    log "Starting Genesis installation..."
+    log "Starting ChronoVerse installation..."
     echo ""
 
     local os=$(detect_os)
@@ -529,9 +529,9 @@ main() {
     log "Step 2/7: Setting up local AI runtime..."
     install_ollama || warn "Ollama install failed. Cloud AI will be used instead."
 
-    # Download Genesis
+    # Download ChronoVerse
     echo ""
-    log "Step 3/7: Downloading Genesis..."
+    log "Step 3/7: Downloading ChronoVerse..."
     if [[ -n "$OFFLINE_BUNDLE" ]]; then
         log "Using offline bundle: $OFFLINE_BUNDLE"
         tar -xzf "$OFFLINE_BUNDLE" -C "$install_dir" 2>/dev/null || \
@@ -540,13 +540,13 @@ main() {
         download_binary "$install_dir" || {
             warn "Download failed. Using built-in bootstrap mode."
             mkdir -p "$install_dir/bin"
-            cat > "$install_dir/genesis" << 'BOOTSTRAP'
+            cat > "$install_dir/chronoverse" << 'BOOTSTRAP'
 #!/bin/bash
-echo "Genesis Bootstrap Mode"
+echo "ChronoVerse Bootstrap Mode"
 echo "Full binary not available — running in development mode"
 echo "Set CV_INSTALL_DIR and re-run the installer with a valid download URL"
 BOOTSTRAP
-            chmod +x "$install_dir/genesis"
+            chmod +x "$install_dir/chronoverse"
         }
     fi
 
@@ -591,35 +591,35 @@ STATE
     # ─── Success! ─────────────────────────────────────────────────────────────
     echo ""
     echo -e "${GREEN}╔═══════════════════════════════════════════════════════════╗${RESET}"
-    echo -e "${GREEN}║         ✅  Genesis Installed Successfully!           ║${RESET}"
+    echo -e "${GREEN}║         ✅  ChronoVerse Installed Successfully!           ║${RESET}"
     echo -e "${GREEN}╚═══════════════════════════════════════════════════════════╝${RESET}"
     echo ""
     echo -e "  ${BOLD}Location:${RESET}  ${install_dir}"
     echo -e "  ${BOLD}Version:${RESET}   ${CV_VERSION}"
     echo ""
     echo -e "  ${BOLD}To create a new game:${RESET}"
-    echo -e "    genesis-cli new my-game"
+    echo -e "    chronoverse-cli new my-game"
     echo ""
     echo -e "  ${BOLD}To open the editor:${RESET}"
-    echo -e "    ${install_dir}/genesis"
+    echo -e "    ${install_dir}/chronoverse"
     echo ""
     echo -e "  ${BOLD}Chat to build from anywhere:${RESET}"
     echo -e "    Set up Telegram bot in Editor → Hub → Telegram"
     echo ""
-    echo -e "${YELLOW}  Note: Run 'source ~/.bashrc' to use genesis-cli${RESET}"
+    echo -e "${YELLOW}  Note: Run 'source ~/.bashrc' to use chronoverse-cli${RESET}"
     echo ""
 
     # Launch if not suppressed
     if [[ "$NO_LAUNCH" != "true" && "$SILENT" != "true" ]]; then
-        read -p "Launch Genesis now? [Y/n] " -n 1 -r
+        read -p "Launch ChronoVerse now? [Y/n] " -n 1 -r
         echo ""
         if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-            log "Launching Genesis..."
-            nohup "${install_dir}/genesis" &>/dev/null &
+            log "Launching ChronoVerse..."
+            nohup "${install_dir}/chronoverse" &>/dev/null &
         fi
     elif [[ "$NO_LAUNCH" != "true" && "$SILENT" == "true" ]]; then
-        log "Launching Genesis (silent mode)..."
-        nohup "${install_dir}/genesis" &>/dev/null &
+        log "Launching ChronoVerse (silent mode)..."
+        nohup "${install_dir}/chronoverse" &>/dev/null &
     fi
 }
 

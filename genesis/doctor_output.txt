@@ -1,7 +1,7 @@
 error: key with no value, expected `=`
- --> crates/genesis-math/Cargo.toml:3:12
+ --> crates/chronoverse-math/Cargo.toml:3:12
   |
 3 | version."*"
   |            ^
-error: failed to load manifest for workspace member `/app/genesis/crates/genesis-math`
+error: failed to load manifest for workspace member `/app/genesis/crates/chronoverse-math`
 referenced by workspace at `/app/genesis/Cargo.toml`

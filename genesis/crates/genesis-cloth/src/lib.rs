@@ -1,4 +1,4 @@
-//! Genesis Cloth & Soft Body Simulation
+//! ChronoVerse Cloth & Soft Body Simulation
 //!
 //! Complete cloth simulation system:
 //! - Position-based dynamics (PBD) cloth — stable, fast

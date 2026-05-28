@@ -6,6 +6,9 @@ use chrono::{DateTime,Utc};
 pub mod holo;
 pub mod self_improve;
 pub mod code_fix;
+pub mod research;
+pub mod collaboration;
+pub mod explainer;
 
 use crate::holo::HoloStack;
 use crate::self_improve::SelfImproveAgent;
@@ -501,3 +504,4 @@ impl AgentCouncil {
 
 impl Default for AgentCouncil { fn default() -> Self { Self::new() } }
 extern crate tracing;
+mod tests;

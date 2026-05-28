@@ -1,0 +1,4 @@
+all_docx_files.txt
+ChronoVerse_Master_Blueprint.docx
+VirtualStudio_Complete_Design_Document_v13_MERGED_FINAL.docx
+nexa-holo.docx

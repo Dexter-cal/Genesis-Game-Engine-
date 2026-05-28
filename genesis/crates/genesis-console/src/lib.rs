@@ -1,4 +1,4 @@
-//! Genesis Engine Console / Terminal
+//! ChronoVerse Engine Console / Terminal
 //!
 //! A fully-featured in-engine console like Godot's,
 //! but with AI assistance built in.
@@ -513,7 +513,7 @@ impl AiCodeAssistant {
     /// Format a code completion request
     pub fn build_completion_prompt(&self, code_before: &str, instruction: &str) -> String {
         format!(
-            "In {} scripting language for Genesis game engine:\n\
+            "In {} scripting language for ChronoVerse game engine:\n\
              Context: {}\n\
              Instruction: {}\n\
              Complete the code following the instruction. \
@@ -641,7 +641,7 @@ impl EngineConsole {
         console.macros.insert("clear".to_string(), "__clear__".to_string());
 
         // Welcome message
-        console.log(LogLevel::Info, "engine", "Genesis Engine Console ready. Type 'help' for commands.");
+        console.log(LogLevel::Info, "engine", "ChronoVerse Engine Console ready. Type 'help' for commands.");
         console.log(LogLevel::Info, "engine", "AI Assistant active — ask questions with '?' prefix: ?how do I spawn an enemy");
         console
     }
@@ -727,7 +727,7 @@ impl EngineConsole {
         // Built-in commands
         match input.trim() {
             "help" => {
-                let help = r#"Genesis Console Commands:
+                let help = r#"ChronoVerse Console Commands:
   help              — Show this help
   clear             — Clear console
   entities          — Show entity count

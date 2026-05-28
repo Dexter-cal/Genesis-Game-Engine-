@@ -1,6 +1,6 @@
-//! Genesis Hub — Platform Connections
+//! ChronoVerse Hub — Platform Connections
 //!
-//! Connect Genesis to external platforms so creators can:
+//! Connect ChronoVerse to external platforms so creators can:
 //! - Build games from their phone via chat (Telegram, WhatsApp, iMessage)
 //! - Get build status updates on Discord
 //! - Voice-command the engine via Alexa / Google Home
@@ -36,7 +36,7 @@ pub mod streaming;
 
 pub use telegram::TelegramBot;
 pub use discord::DiscordBot;
-pub use rest_api::GenesisApiServer;
+pub use rest_api::ChronoVerseApiServer;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -542,8 +542,8 @@ pub mod streaming {
 pub mod rest_api {
     use super::*;
 
-    /// The Genesis REST API — allows any external tool to control the engine
-    pub struct GenesisApiServer {
+    /// The ChronoVerse REST API — allows any external tool to control the engine
+    pub struct ChronoVerseApiServer {
         pub port: u16,
         pub api_keys: HashMap<String, ApiKeyInfo>,
         running: bool,
@@ -558,7 +558,7 @@ pub mod rest_api {
         pub created_at: u64,
     }
 
-    impl GenesisApiServer {
+    impl ChronoVerseApiServer {
         pub fn new(port: u16) -> Self {
             Self { port, api_keys: HashMap::new(), running: false }
         }

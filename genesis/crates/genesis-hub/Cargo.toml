@@ -2,7 +2,7 @@
 name = "genesis-hub"
 version.workspace = true
 edition.workspace = true
-description = "Genesis Hub - platform connections, bots, remote creation via chat"
+description = "ChronoVerse Hub - platform connections, bots, remote creation via chat"
 [dependencies]
 tokio = { workspace = true }
 serde = { workspace = true }

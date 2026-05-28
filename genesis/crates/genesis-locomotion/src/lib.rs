@@ -1,4 +1,4 @@
-//! Genesis Realistic Locomotion System
+//! ChronoVerse Realistic Locomotion System
 //!
 //! Makes characters move like real people — not like game puppets.
 //! Based on techniques from Ghost of Tsushima, Horizon, The Last of Us:

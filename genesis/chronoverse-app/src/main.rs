@@ -1,4 +1,4 @@
-//! Genesis — The AI-First Game Engine
+//! ChronoVerse — The AI-First Game Engine
 //!
 //! Main entry point. Boots:
 //! 1. Tracing / logging
@@ -14,27 +14,27 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 use tracing::{info, warn, error};
 
-use genesis_core::{
+use chronoverse_core::{
     engine::Engine,
     config::{EngineConfig, WindowConfig, AiConfig},
 };
-use genesis_agents::{
+use chronoverse_agents::{
     AgentRegistry, AgentContext, TokenBudget,
     budget::BudgetLimit,
     tools::ToolRegistry,
     agents::create_all_agents,
 };
-use genesis_ecs::world::World;
-use genesis_physics::{PhysicsPlugin, WindManager};
-use genesis_input::InputManager;
-use genesis_network::GameSession;
+use chronoverse_ecs::world::World;
+use chronoverse_physics::{PhysicsPlugin, WindManager};
+use chronoverse_input::InputManager;
+use chronoverse_network::GameSession;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // ─── Tracing ──────────────────────────────────────────────────────────
     tracing_subscriber::fmt()
         .with_env_filter(
-            std::env::var("CHRONO_LOG").unwrap_or_else(|_| "genesis=debug,warn".to_string())
+            std::env::var("CHRONO_LOG").unwrap_or_else(|_| "chronoverse=debug,warn".to_string())
         )
         .with_target(true)
         .with_thread_names(false)
@@ -88,8 +88,8 @@ async fn main() -> Result<()> {
     agents.initialize_all(&agent_ctx).await?;
 
     // ─── Register Plugins ─────────────────────────────────────────────────
-    let physics = genesis_physics::PhysicsPlugin::new(
-        genesis_math::vec3::Vec3::new(0.0, -9.81, 0.0),
+    let physics = chronoverse_physics::PhysicsPlugin::new(
+        chronoverse_math::vec3::Vec3::new(0.0, -9.81, 0.0),
         config.fixed_physics_hz,
     );
     engine.add_plugin(physics)?;
@@ -98,7 +98,7 @@ async fn main() -> Result<()> {
     engine.initialize().await?;
 
     info!("═══════════════════════════════════════════════");
-    info!("  Genesis Engine READY");
+    info!("  ChronoVerse Engine READY");
     info!("  Session: {}", session.id);
     info!("  Agents:  {}", agents.agent_count());
     info!("═══════════════════════════════════════════════");
@@ -127,7 +127,7 @@ async fn main() -> Result<()> {
     agents.shutdown_all().await?;
     engine.shutdown().await?;
 
-    info!("Genesis shutdown complete. Goodbye.");
+    info!("ChronoVerse shutdown complete. Goodbye.");
     Ok(())
 }
 
@@ -160,7 +160,7 @@ fn load_config() -> Result<EngineConfig> {
 
     // Fall back to defaults
     Ok(EngineConfig {
-        project_name: "Genesis Project".to_string(),
+        project_name: "ChronoVerse Project".to_string(),
         ..Default::default()
     })
 }

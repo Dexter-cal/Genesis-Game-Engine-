@@ -1,4 +1,4 @@
-//! Genesis GPU Lab — Cloud GPU Integration
+//! ChronoVerse GPU Lab — Cloud GPU Integration
 //!
 //! For creators who don't have a local GPU:
 //! - Connect to Kaggle, Google Colab, RunPod, Vast.ai, Lambda, Linode
@@ -95,7 +95,7 @@ pub struct HuggingFaceModel {
     pub size_gb: f32,
     pub gated: bool,              // requires HF account/agreement
     pub versions: Vec<HfModelVersion>,
-    pub recommended_for: Vec<String>, // Genesis task suggestions
+    pub recommended_for: Vec<String>, // ChronoVerse task suggestions
     pub min_vram_gb: f32,
     pub can_run_cpu: bool,
 }
@@ -228,8 +228,8 @@ impl GpuLabNotebookGenerator {
     }
 
     fn header_cell(config: &NotebookConfig) -> String {
-        Self::make_cell("markdown", r#"# Genesis GPU Lab
-**This notebook connects your cloud GPU to the Genesis game engine.**
+        Self::make_cell("markdown", r#"# ChronoVerse GPU Lab
+**This notebook connects your cloud GPU to the ChronoVerse game engine.**
 
 ## What this does:
 1. Installs all required AI model dependencies
@@ -349,7 +349,7 @@ print("📁 Use list_model_files('model/id') to see files")
     fn model_suggestions_cell() -> String {
         let code = r#"
 # ═══════════════════════════════════════════════
-# STEP 3: Genesis Model Suggestions
+# STEP 3: ChronoVerse Model Suggestions
 # ═══════════════════════════════════════════════
 
 CHRONOVERSE_MODELS = {
@@ -561,7 +561,7 @@ CONNECTION_TOKEN = "{token}"
 SERVER_PORT = {port}
 
 async def handle_connection(websocket, path):
-    """Handle incoming connection from Genesis engine"""
+    """Handle incoming connection from ChronoVerse engine"""
     # Authenticate
     auth_msg = await websocket.recv()
     auth = json.loads(auth_msg)
@@ -571,7 +571,7 @@ async def handle_connection(websocket, path):
         await websocket.close()
         return
 
-    print(f"✅ Genesis engine connected!")
+    print(f"✅ ChronoVerse engine connected!")
     await websocket.send(json.dumps({{
         "status": "connected",
         "models": list(loaded_models.keys()),
@@ -681,7 +681,7 @@ print(f"\n📋 Connection info:\n{{json.dumps(CONNECTION_INFO, indent=2)}}")
     fn connect_to_engine_cell(config: &NotebookConfig) -> String {
         let code = r#"
 # ═══════════════════════════════════════════════
-# STEP 8: Connect to Genesis Engine
+# STEP 8: Connect to ChronoVerse Engine
 # ═══════════════════════════════════════════════
 # The engine will auto-detect this server if on same network
 # Or paste the connection info into the engine's GPU Lab settings
@@ -694,7 +694,7 @@ print(f"Connection Info:")
 import json
 print(json.dumps(CONNECTION_INFO, indent=2))
 print("\n")
-print("In Genesis Editor:")
+print("In ChronoVerse Editor:")
 print("  1. Open Project Settings → GPU Lab")
 print("  2. Enter the Connection Token above")
 print("  3. Enter the Host and Port above")
@@ -709,7 +709,7 @@ engine_url = "http://YOUR_ENGINE_IP:8080/api/v1/gpu_lab/register"
 try:
     r = httpx.post(engine_url, json=CONNECTION_INFO, timeout=5.0)
     if r.status_code == 200:
-        print("✅ Auto-registered with Genesis engine!")
+        print("✅ Auto-registered with ChronoVerse engine!")
     else:
         print(f"Manual registration needed (engine returned {r.status_code})")
 except:

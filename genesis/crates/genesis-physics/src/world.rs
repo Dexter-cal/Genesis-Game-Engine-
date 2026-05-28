@@ -1,4 +1,4 @@
-//! Physics world — wraps Rapier3D with Genesis conventions.
+//! Physics world — wraps Rapier3D with ChronoVerse conventions.
 
 use rapier3d::prelude::*;
 use std::collections::HashMap;
@@ -10,7 +10,7 @@ use tracing::{debug, warn};
 use genesis_math::vec3::Vec3;
 use genesis_core::events::{EventBus, GameEvent, EventPriority};
 
-/// Maps Genesis entity string IDs to Rapier handles
+/// Maps ChronoVerse entity string IDs to Rapier handles
 #[derive(Default)]
 pub struct PhysicsHandles {
     pub rigid_bodies:    HashMap<String, RigidBodyHandle>,

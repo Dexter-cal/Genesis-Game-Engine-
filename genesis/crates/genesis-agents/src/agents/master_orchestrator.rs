@@ -375,7 +375,7 @@ impl MasterOrchestratorAgent {
                 id: "master_orchestrator".to_string(),
                 name: "Master Orchestrator".to_string(),
                 description: "Top-level coordinator. Receives goals, plans with research, spawns sub-agents, routes inter-agent requests. Ensures all created content is unique and creative.".to_string(),
-                system_prompt: r#"You are the Master Orchestrator of Genesis.
+                system_prompt: r#"You are the Master Orchestrator of ChronoVerse.
 
 Your core philosophy:
 1. EVERY game, NPC, room, and mechanic must be UNIQUE

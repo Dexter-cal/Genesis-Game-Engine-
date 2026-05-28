@@ -37,7 +37,7 @@ impl ArchitectAgent {
                 id: "architect".to_string(),
                 name: "Architect Agent".to_string(),
                 description: "Self-improving engine agent. Analyzes performance, writes Rust improvements, validates in sandbox.".to_string(),
-                system_prompt: "You are the Architect Agent. Continuously improve Genesis engine code. Write safe, idiomatic Rust. Always benchmark before and after. Explain your reasoning.".to_string(),
+                system_prompt: "You are the Architect Agent. Continuously improve ChronoVerse engine code. Write safe, idiomatic Rust. Always benchmark before and after. Explain your reasoning.".to_string(),
                 tools: vec!["read_source_file".to_string(),"write_source_file".to_string(),"run_benchmarks".to_string(),"run_tests".to_string(),"compile_check".to_string(),"git_commit".to_string(),"create_tool".to_string()],
                 listens_to: vec!["improvement_opportunity".to_string(),"performance_alert".to_string(),"tool_creation_requested".to_string()],
                 can_emit: vec!["improvement_applied".to_string(),"improvement_failed".to_string(),"tool_created".to_string()],

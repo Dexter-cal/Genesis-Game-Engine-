@@ -1,4 +1,4 @@
-//! Genesis World System
+//! ChronoVerse World System
 //!
 //! Manages the entire game world:
 //! - Infinite world streaming via chunk system

@@ -1,6 +1,6 @@
 //! NPC Brain Agent
 //!
-//! The most complex agent in Genesis.
+//! The most complex agent in ChronoVerse.
 //! Gives every NPC a mind: personality, memory, goals, emotions, decisions.
 //!
 //! Architecture:

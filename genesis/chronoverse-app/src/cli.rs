@@ -1,16 +1,16 @@
-//! Genesis CLI
+//! ChronoVerse CLI
 //!
 //! Usage:
-//!   genesis-cli new my-game         Create a new game project
-//!   genesis-cli build               Build the current project
-//!   genesis-cli run                 Run the current project
-//!   genesis-cli publish             Publish to Genesis Store
-//!   genesis-cli status              Show build status
-//!   genesis-cli agent list          List all agents
-//!   genesis-cli agent disable NAME  Disable an agent
-//!   genesis-cli export --platform pc  Export for PC
-//!   genesis-cli export --platform web Export for WebGL
-//!   genesis-cli model download NAME  Download an AI model
+//!   chronoverse-cli new my-game         Create a new game project
+//!   chronoverse-cli build               Build the current project
+//!   chronoverse-cli run                 Run the current project
+//!   chronoverse-cli publish             Publish to ChronoVerse Store
+//!   chronoverse-cli status              Show build status
+//!   chronoverse-cli agent list          List all agents
+//!   chronoverse-cli agent disable NAME  Disable an agent
+//!   chronoverse-cli export --platform pc  Export for PC
+//!   chronoverse-cli export --platform web Export for WebGL
+//!   chronoverse-cli model download NAME  Download an AI model
 
 use anyhow::Result;
 
@@ -31,13 +31,13 @@ async fn main() -> Result<()> {
             println!("▶️  Running project...");
         }
         Some("version") => {
-            println!("Genesis CLI v{}", genesis_core::ENGINE_VERSION);
+            println!("ChronoVerse CLI v{}", chronoverse_core::ENGINE_VERSION);
         }
         Some("help") | None => {
             print_help();
         }
         Some(cmd) => {
-            eprintln!("Unknown command: {}. Run `genesis-cli help` for usage.", cmd);
+            eprintln!("Unknown command: {}. Run `chronoverse-cli help` for usage.", cmd);
         }
     }
     Ok(())
@@ -69,12 +69,12 @@ fn create_project(name: &str) -> Result<()> {
     // Create hello world script
     std::fs::write(
         format!("{}/scripts/hello.cv", name),
-        r#"# Welcome to Genesis!
+        r#"# Welcome to ChronoVerse!
 # This is your first ChronoScript
 
 @on("GAME_START")
 def on_start():
-    debug.log("Hello, Genesis!")
+    debug.log("Hello, ChronoVerse!")
     world.spawn_entity("prop", "Magic Orb", position=[0, 1, 0])
 
 @tick(interval=2.0)
@@ -87,23 +87,23 @@ def heartbeat():
     println!("");
     println!("Next steps:");
     println!("  cd {}", name);
-    println!("  genesis          # Open in editor");
-    println!("  genesis-cli run  # Run directly");
+    println!("  chronoverse          # Open in editor");
+    println!("  chronoverse-cli run  # Run directly");
 
     Ok(())
 }
 
 fn print_help() {
-    println!("Genesis CLI v{}", genesis_core::ENGINE_VERSION);
+    println!("ChronoVerse CLI v{}", chronoverse_core::ENGINE_VERSION);
     println!("");
     println!("USAGE:");
-    println!("  genesis-cli <COMMAND> [OPTIONS]");
+    println!("  chronoverse-cli <COMMAND> [OPTIONS]");
     println!("");
     println!("COMMANDS:");
     println!("  new <name>           Create a new game project");
     println!("  run                  Run the project in the current directory");
     println!("  build                Build without running");
-    println!("  publish              Publish to Genesis Store");
+    println!("  publish              Publish to ChronoVerse Store");
     println!("  export               Export to platforms (--platform pc|web|android|ios)");
     println!("  agent list           List all AI agents and their status");
     println!("  agent disable <id>   Disable a specific agent");
@@ -115,7 +115,7 @@ fn print_help() {
     println!("  help                 Show this help");
     println!("");
     println!("EXAMPLES:");
-    println!("  genesis-cli new my-rpg");
-    println!("  genesis-cli export --platform web --output ./dist");
-    println!("  genesis-cli model download kokoro-82m");
+    println!("  chronoverse-cli new my-rpg");
+    println!("  chronoverse-cli export --platform web --output ./dist");
+    println!("  chronoverse-cli model download kokoro-82m");
 }

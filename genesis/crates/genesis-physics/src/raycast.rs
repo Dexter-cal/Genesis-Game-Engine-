@@ -1,4 +1,4 @@
-//! Genesis Raycast & Aim System
+//! ChronoVerse Raycast & Aim System
 //!
 //! Complete raycasting:
 //! - Physics raycasts (collision queries against world geometry)

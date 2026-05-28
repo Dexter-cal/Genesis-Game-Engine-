@@ -1,7 +1,11 @@
 use genesis_core::GenesisApp;
 use genesis_ecs::World;
 use genesis_math::Vec3;
-use genesis_agents::Agent;
+use genesis_agents::{Agent, AgentKind, AgentCouncil};
+
+mod combat;
+mod quest;
+use combat::{Combatant, CombatState};
 
 fn main() {
     println!("Starting Neon Nexus - Built with Genesis Engine");
@@ -15,20 +19,25 @@ fn main() {
         .with("Player".to_string())
         .id();
 
-    // Create AI Guardian using the new Genesis AI system
+    // Create AI Guardian
+    let mut guardian_agent = Agent::new("Guardian_01", AgentKind::CombatAgent, "qwen2.5:7b", "ollama");
+    let guardian_combat = Combatant { health: 100.0, aggression: 0.8, state: CombatState::Idle };
+
     let guardian = world.spawn()
         .with(Vec3::new(10.0, 0.0, 10.0))
-        .with(Agent::new("Neon Guardian"))
+        .with(guardian_agent)
         .id();
 
-    println!("World initialized with {} entities.", world.len());
-    println!("Neon Guardian deployed at [10, 0, 10]");
+    println!("World initialized with entities.");
 
-    // Autonomous Improvement Simulation
-    println!("Triggering Autonomous Self-Improvement Check...");
-    let mut council = genesis_agents::AgentCouncil::new();
+    // Trigger Council Tick (Simulation)
+    let mut council = AgentCouncil::new();
     council.tick(0.016);
 
-    // app.run(world); // Real game loop
-    println!("Neon Nexus Demo: Logic Verified.");
+    // Dynamic Quest
+    let mut quest_agent = Agent::new("Oracle", AgentKind::QuestAgent, "qwen2.5:7b", "ollama");
+    let quest = quest::generate_dynamic_quest(&mut quest_agent);
+    println!("New Dynamic Quest: {} - {}", quest.title, quest.description);
+
+    println!("Neon Nexus Demo: Systems Operational.");
 }

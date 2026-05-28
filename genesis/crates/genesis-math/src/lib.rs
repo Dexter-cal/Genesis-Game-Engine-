@@ -1,4 +1,4 @@
-//! Genesis Math Library
+//! ChronoVerse Math Library
 //!
 //! Provides: Vec2, Vec3, Vec4, Mat4, Quaternion, AABB, Ray,
 //! Noise functions (Perlin, Simplex), Easing functions,

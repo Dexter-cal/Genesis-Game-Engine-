@@ -1,4 +1,4 @@
-//! Collision shapes — all shape types Genesis supports
+//! Collision shapes — all shape types ChronoVerse supports
 use rapier3d::prelude::*;
 use genesis_math::vec3::Vec3;
 use serde::{Serialize, Deserialize};

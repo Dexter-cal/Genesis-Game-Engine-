@@ -394,7 +394,7 @@ fn color_distance(a: Color, b: Color) -> f32 {
 // ─── Default PBR WGSL Shader ─────────────────────────────────────────────────
 
 pub const DEFAULT_PBR_WGSL: &str = r#"
-// Genesis Standard PBR Shader
+// ChronoVerse Standard PBR Shader
 // Compatible with WGPU (Vulkan, Metal, DX12, WebGPU)
 
 struct VertexInput {

@@ -1,4 +1,4 @@
-//! Genesis Security System
+//! ChronoVerse Security System
 //!
 //! Multi-layer security for the engine and games:
 //!

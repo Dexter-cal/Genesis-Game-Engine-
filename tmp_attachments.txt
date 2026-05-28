@@ -1,4 +1,0 @@
-total 228
-drwxrwxr-x 2 jules jules   4096 May 19 06:19 .
-drwxrwxrwt 1 root  root    4096 May 21 12:39 ..
--rw-rw-r-- 1 jules jules 221734 May 19 06:19 Screenshot_20260519-090859.jpg

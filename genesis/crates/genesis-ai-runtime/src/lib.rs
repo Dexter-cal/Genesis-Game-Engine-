@@ -1,4 +1,4 @@
-//! Genesis AI Runtime — Smart Hardware-Adaptive Model System
+//! ChronoVerse AI Runtime — Smart Hardware-Adaptive Model System
 //!
 //! Automatically picks the best AI model for ANY hardware.
 //! From a $200 Raspberry Pi to a $10,000 workstation — it just works.
